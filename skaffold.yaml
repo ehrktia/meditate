@@ -1,0 +1,13 @@
+apiVersion: skaffold/v2beta8
+kind: Config
+metadata:
+  name: meditate
+build:
+  artifacts:
+  - image: europe-west2-docker.pkg.dev/karthick-dev-301823/karthick-dt-dev/meditate
+deploy:
+  kubectl:
+    manifests:
+    - deployments/deployment.yaml
+    - deployments/pod.yaml
+    - deployments/service.yaml
