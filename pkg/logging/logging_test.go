@@ -2,15 +2,13 @@ package logging
 
 import (
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 func Test_new_logger(t *testing.T) {
     got,err:=NewLogger()
-    if err!=nil {
-        t.Error(err)
-    }
-    if got==nil {
-        t.Error("can not create logger")
-    }
+    assert.Nil(t,err)
+    assert.NotNil(t, got)
     t.Run("should be able to use the logger", func(t *testing.T) {
         got.Info("logger initializes")
     })
