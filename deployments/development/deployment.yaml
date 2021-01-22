@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: meditate
+spec:
+  selector:
+    matchLabels:
+      app: meditate
+  template:
+    metadata:
+      labels:
+        app: meditate
+    spec:
+      containers:
+      - name: meditate
+        image: europe-west2-docker.pkg.dev/karthick-dev-301823/karthick-dt-dev/meditate:latest
+        resources:
+          limits:
+            memory: "75Mi"
+            cpu: "50m"
+        ports:
+        - containerPort: 80
