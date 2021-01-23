@@ -1,7 +1,5 @@
 # meditate
 
-
-[Go Workflow](https://github.com/web-alytics/meditate/workflows/.github/workflows/go.yml/badge.svg)
-
+![GitHub Workflow Status](https://img.shields.io/github/workflow/status/web-alytics/meditate/Go)
 
 app for self improvement
