@@ -1,31 +1,68 @@
 package ticker
 
-import "time"
+import (
+	"fmt"
+	"io"
+	"os"
+	"time"
+)
+
+const (
+	defaultInterimInterval = "INTERIM_INTERVAL"
+	defaultTickerInterval  = 1 * time.Second
+	defaultSessionDuration = "SESSION_DURATION"
+)
+
 type timer struct {
-    tickerDuration time.Duration
-    startTime time.Time
-    ticker *time.Ticker
-    intervalDuration time.Duration
-    intervalTicker *time.Ticker
+	sessionDuration              string
+	sessionDurationFormat        time.Duration
+	defaultInterimIntervalFormat time.Duration
 }
+
 // IntialiseTimer starts a timer for provided duration
-func IntialiseTimer(d ,intervalTime time.Duration) timer {
-    return timer{startTime:time.Now(),
-    ticker: time.NewTicker(d),
-    intervalDuration: intervalTime,
-    intervalTicker: time.NewTicker(intervalTime),
-    tickerDuration: d,
+func IntialiseTimer() (timer, error) {
+	defaultSession := os.Getenv(defaultSessionDuration)
+	duration, err := time.ParseDuration(defaultSession)
+	if err != nil {
+		return timer{}, err
+	}
+	defaultInterim := os.Getenv(defaultInterimInterval)
+	defaultDuration, err := time.ParseDuration(defaultInterim)
+	if err != nil {
+		return timer{}, err
+	}
+	if duration.Seconds() < defaultDuration.Seconds() {
+		return timer{}, fmt.Errorf("error session time can not be lower than defaultInterimInterval")
+	}
+	return timer{
+		sessionDuration:              defaultSession,
+		sessionDurationFormat:        duration,
+		defaultInterimIntervalFormat: defaultDuration,
+	}, nil
 }
-}
-// GetTicker gives the ticker for set duration
-func (t *timer) GetTicker() *time.Ticker {
-    return t.ticker
-}
-// GetIntervalTimer provides the ticker to go off in set interval
-func (t *timer) GetIntervalTimer() *time.Ticker {
-    return t.intervalTicker
-}
-// TODO:  <23-01-21, karthick> recursive call to interval timer based
-// on check to the total duration and interval
 
+// CountInterimTimers provides total number of interim counters required for the session based on defaultInterimInterval
+func CountInterimTimers(t timer) int {
+	timerCount := t.sessionDurationFormat.Seconds() / t.defaultInterimIntervalFormat.Seconds()
+	return int(timerCount)
+}
 
+// InitiateTicker starts a ticker
+func InitiateInterimTimer(t timer, status chan bool) {
+	time.Sleep(t.defaultInterimIntervalFormat)
+	status <- true
+}
+func StartInterimTimer(w io.Writer, t timer, status chan bool) {
+	ticker := time.NewTicker(defaultTickerInterval)
+	defer ticker.Stop()
+	go InitiateInterimTimer(t, status)
+	for {
+		select {
+		case tc := <-ticker.C:
+			fmt.Fprintf(w, "time Now: %v\n", tc)
+		case <-status:
+			fmt.Fprintf(w, "completed\n")
+			return
+		}
+	}
+}
