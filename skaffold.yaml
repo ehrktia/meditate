@@ -8,6 +8,6 @@ build:
 deploy:
   kubectl:
     manifests:
-    - deployments/deployment.yaml
-    - deployments/pod.yaml
-    - deployments/service.yaml
+    - deployments/base/deployment.yaml
+    - deployments/base/pod.yaml
+    - deployments/base/service.yaml
