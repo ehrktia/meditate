@@ -66,8 +66,14 @@ func TestInterimTicker(t *testing.T) {
 			t.Error("timer ran out")
 		}
 	})
+	t.Run("should provide no of interim timers for session", func(t *testing.T) {
+		got := CountInterimTimers(timer)
+		if got != 2 {
+			t.Errorf("expected: %v got: %v", 2, got)
+		}
+	})
 	buf := new(buffer.Buffer)
-	t.Run("should have equal number of timers based on number of timers for interim", func(t *testing.T) {
+	t.Run("should run countdown for each sec for one interim timer", func(t *testing.T) {
 		StartInterimTimer(buf, timer, status)
 		if strings.Count(buf.String(), "\n") < 6 {
 			t.Error("expected 6 lines in output")
