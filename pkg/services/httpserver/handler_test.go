@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/meditate/pkg/model"
 	"github.com/stretchr/testify/assert"
@@ -16,12 +17,17 @@ import (
 func Test_routing(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	t.Run("respond to POST to login route", func(t *testing.T) {
-		server, err := NewHTTPServer()
-		assert.Nil(t, err)
-		assert.Nil(t, server.RegisterRoutes())
+		serv, err := NewHTTPServer()
+		if err != nil {
+			t.Fatal(err)
+		}
+		if err := serv.RegisterRoutes(); err != nil {
+			t.Fatal(err)
+		}
 		errCh := make(chan error, 1)
 		go func() {
-			if err := server.Run(ctx); err != nil {
+			err := serv.Run(ctx)
+			if err != nil {
 				errCh <- err
 			}
 		}()
@@ -41,9 +47,13 @@ func Test_routing(t *testing.T) {
 		assert.Equal(t, http.StatusOK, resp.StatusCode)
 		assert.Contains(t, gotValues.Email, "testuser")
 		assert.Contains(t, gotValues.Password, "password")
-	})
-	t.Cleanup(func() {
-		cancel()
+		select {
+		case e := <-errCh:
+			t.Fatal(e)
+		case <-time.After(2 * time.Second):
+			t.Log("time out")
+			cancel()
+		}
 	})
 
 }
