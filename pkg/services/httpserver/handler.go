@@ -5,16 +5,24 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/meditate/pkg/model"
 )
+
 func loginHandler(c *gin.Context) {
+	u := &model.User{}
+	u.Email = c.PostForm("username")
+	u.Password = c.PostForm("password")
+	c.JSON(http.StatusOK, gin.H{
+		"username": u.Email,
+		"password": u.Password,
+	})
+}
+func registerHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, nil)
 }
-func registerHandler(c *gin.Context)  {
-	c.JSON(http.StatusOK,nil)
-}
 
-func (h *httpServer)register(routes *routeList) error  {
-	for _,route := range routes.routeList {
+func (h *httpServer) register(routes *routeList) error {
+	for _, route := range routes.routeList {
 		switch route.method {
 		case http.MethodGet:
 			h.engine.GET(route.path, route.handler)
@@ -30,7 +38,3 @@ func (h *httpServer)register(routes *routeList) error  {
 	}
 	return nil
 }
-
-
-
-

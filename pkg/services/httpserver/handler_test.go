@@ -2,39 +2,48 @@ package httpserver
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
+	"strings"
 	"testing"
 
+	"github.com/meditate/pkg/model"
 	"github.com/stretchr/testify/assert"
 )
-func startServer(ctx context.Context,t *testing.T,errch chan<- error)  {
-	server:=NewHTTPServer()
-	t.Helper()
-	if err:=server.RegisterRoutes();err!=nil {
-		errch<-err
-	}
-	if err:=server.Run(ctx);err!=nil {
-		errch<-err
-	}
-}
 
 func Test_routing(t *testing.T) {
-	ctx,cancel:=context.WithCancel(context.Background())
-	errch:=make(chan error, 1)
-	go startServer(ctx,t,errch)
+	ctx, cancel := context.WithCancel(context.Background())
 	t.Run("respond to POST to login route", func(t *testing.T) {
-		client:=http.DefaultClient
-		url:=fmt.Sprintf("http://%s/%s", defaultPort,"login")
-		req,err:=http.NewRequest(http.MethodPost, url, nil)
+		server, err := NewHTTPServer()
 		assert.Nil(t, err)
-		resp,err:=client.Do(req)
+		assert.Nil(t, server.RegisterRoutes())
+		errCh := make(chan error, 1)
+		go func() {
+			if err := server.Run(ctx); err != nil {
+				errCh <- err
+			}
+		}()
+		client := http.DefaultClient
+		url := fmt.Sprintf("http://%s/%s", defaultPort, "login")
+		fromValues := strings.NewReader("username=testuser&password=password")
+		req, err := http.NewRequest(http.MethodPost, url, fromValues)
+		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+		assert.Nil(t, err)
+		resp, err := client.Do(req)
+		assert.Nil(t, err)
+		data, err := ioutil.ReadAll(resp.Body)
+		assert.Nil(t, err)
+		gotValues := new(model.User)
+		err = json.Unmarshal(data, gotValues)
 		assert.Nil(t, err)
 		assert.Equal(t, http.StatusOK, resp.StatusCode)
+		assert.Contains(t, gotValues.Email, "testuser")
+		assert.Contains(t, gotValues.Password, "password")
 	})
 	t.Cleanup(func() {
 		cancel()
 	})
 
 }
-
