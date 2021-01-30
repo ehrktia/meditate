@@ -19,6 +19,7 @@ type httpServer struct {
 
 func NewHTTPServer() *httpServer {
 	var port string
+	gin.SetMode(gin.ReleaseMode)
 	r:=gin.New()
 	if port = os.Getenv(httpPort); port == "" {
 		port=defaultPort
