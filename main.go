@@ -11,7 +11,9 @@ func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	server := httpserver.NewHTTPServer()
-	server.RegisterRoutes()
+	if err:=server.RegisterRoutes();err!=nil{
+		panic(err)
+	}
 	e, ctxerrgroup := errgroup.WithContext(ctx)
 	e.Go(func() error {
 		return server.Run(ctxerrgroup)
