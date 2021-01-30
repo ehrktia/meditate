@@ -17,7 +17,7 @@ func Test_add_new_route(t *testing.T) {
 			method: http.MethodPost,
 			handler: loginHandler,
 		}
-		r.addRoutes(route)
+		r.addRoute(route)
 		if len(r.routeList)<1 {
 			t.Error("can not add route")
 

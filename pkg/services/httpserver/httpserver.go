@@ -4,30 +4,50 @@ import (
 	"context"
 	"net/http"
 	"os"
+
+	"github.com/gin-gonic/gin"
 )
 
 const (
 	httpPort    = "HTTPPORT"
 	defaultPort = "0.0.0.0:8033"
 )
-
-func NewHTTPServer() *http.Server {
-	var port string
-	if port = os.Getenv(httpPort); port == "" {
-		port = "0.0.0.0:8033"
-	}
-	return &http.Server{
-		Addr:    port,
-		Handler: http.DefaultServeMux,
-	}
+type httpServer struct {
+	engine *gin.Engine
+	server *http.Server
 }
-func Run(ctx context.Context, server *http.Server) error {
-	if err := server.ListenAndServe(); err != nil {
+
+func NewHTTPServer() *httpServer {
+	var port string
+	r:=gin.New()
+	if port = os.Getenv(httpPort); port == "" {
+		port=defaultPort
+	}
+	return &httpServer{
+		engine: r,
+		server: &http.Server {
+				Addr: port,
+				Handler:r,
+			},
+		}
+}
+
+func (h *httpServer)Run(ctx context.Context) error {
+	go func()error {
+	<- ctx.Done()
+	if err:=h.server.Shutdown(ctx);err!=nil {
 		return err
 	}
-	<-ctx.Done()
-	if err := server.Close(); err != nil {
+	return nil
+	}()
+	if err := h.server.ListenAndServe(); err != nil {
 		return err
 	}
 	return nil
 }
+func (h *httpServer) RegisterRoutes() error {
+	rList:=createRouteList()
+	rList.addRoutes()
+	return h.register(rList)
+}
+
