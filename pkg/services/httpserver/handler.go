@@ -22,6 +22,16 @@ func loginHandler(c *gin.Context) {
 	c.JSON(http.StatusOK,nil)
 }
 func registerHandler(c *gin.Context) {
+	u:=&model.User{}
+	u.Email=c.PostForm("email")
+	u.Password=c.PostForm("pwd")
+	valid,validErr:= u.IsValid()
+	if !valid {
+		 c.JSON(http.StatusNotAcceptable, gin.H{
+			 "user":u.Email,
+			 "error": validErr.Error(),
+		 })
+	}
 	c.JSON(http.StatusOK, nil)
 }
 
