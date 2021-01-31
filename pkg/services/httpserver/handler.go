@@ -12,10 +12,14 @@ func loginHandler(c *gin.Context) {
 	u := &model.User{}
 	u.Email = c.PostForm("username")
 	u.Password = c.PostForm("password")
-	c.JSON(http.StatusOK, gin.H{
-		"username": u.Email,
-		"password": u.Password,
-	})
+	 valid,validErr:=u.IsValid()
+	 if !valid {
+		 c.JSON(http.StatusNotAcceptable, gin.H{
+			 "user":u.Email,
+			 "error": validErr.Error(),
+		 })
+	 }
+	c.JSON(http.StatusOK,nil)
 }
 func registerHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, nil)
@@ -38,3 +42,4 @@ func (h *httpServer) register(routes *routeList) error {
 	}
 	return nil
 }
+

@@ -2,9 +2,7 @@ package httpserver
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"strings"
 	"testing"
@@ -39,14 +37,7 @@ func Test_routing(t *testing.T) {
 		assert.Nil(t, err)
 		resp, err := client.Do(req)
 		assert.Nil(t, err)
-		data, err := ioutil.ReadAll(resp.Body)
-		assert.Nil(t, err)
-		gotValues := new(model.User)
-		err = json.Unmarshal(data, gotValues)
-		assert.Nil(t, err)
 		assert.Equal(t, http.StatusOK, resp.StatusCode)
-		assert.Contains(t, gotValues.Email, "testuser")
-		assert.Contains(t, gotValues.Password, "password")
 		select {
 		case e := <-errCh:
 			t.Fatal(e)
@@ -56,4 +47,15 @@ func Test_routing(t *testing.T) {
 		}
 	})
 
+}
+func Test_login_verify(t *testing.T) {
+	testUser:=model.User{
+		Email: t.Name(),
+		Password: t.Name(),
+	}
+	t.Run("should validate the incoming parameters from login", func(t *testing.T) {
+		got,err:=testUser.IsValid()
+		assert.Nil(t, err)
+		assert.True(t, got)
+	})
 }
