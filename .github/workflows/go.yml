@@ -4,7 +4,7 @@ on: [push]
 
 jobs:
 
-   tests:
+  sec-check:
     runs-on: ubuntu-latest
     env:
       GO111MODULE: on
