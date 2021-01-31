@@ -10,10 +10,16 @@ import (
 func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
-	server := httpserver.NewHTTPServer()
+	server, err := httpserver.NewHTTPServer()
+	if err != nil {
+		panic(err)
+	}
+	if err := server.RegisterRoutes(); err != nil {
+		panic(err)
+	}
 	e, ctxerrgroup := errgroup.WithContext(ctx)
 	e.Go(func() error {
-		return httpserver.Run(ctxerrgroup, server)
+		return server.Run(ctxerrgroup)
 	})
 	if e.Wait() != nil {
 		panic(e.Wait().Error())
