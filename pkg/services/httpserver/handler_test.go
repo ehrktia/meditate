@@ -3,6 +3,7 @@ package httpserver
 import (
 	"context"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"strings"
 	"testing"
@@ -31,13 +32,17 @@ func Test_routing(t *testing.T) {
 		}()
 		client := http.DefaultClient
 		url := fmt.Sprintf("http://%s/%s", defaultPort, "login")
-		fromValues := strings.NewReader("username=testuser&password=password")
+		fromValues := strings.NewReader("username=testuser@test.com&password=123password")
 		req, err := http.NewRequest(http.MethodPost, url, fromValues)
 		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 		assert.Nil(t, err)
 		resp, err := client.Do(req)
 		assert.Nil(t, err)
-		assert.Equal(t, http.StatusOK, resp.StatusCode)
+		if resp.StatusCode!=http.StatusOK {
+			bbytes,err:=ioutil.ReadAll(resp.Body)
+			assert.Nil(t, err)
+			t.Logf("resp body: %+v", string(bbytes))
+		}
 		select {
 		case e := <-errCh:
 			t.Fatal(e)
@@ -67,7 +72,7 @@ func Test_registration(t *testing.T) {
 		}()
 		client := http.DefaultClient
 		url := fmt.Sprintf("http://%s/%s", defaultPort, "register")
-		fromValues := strings.NewReader("email=test@test.com&pwd=password")
+		fromValues := strings.NewReader("email=test@test.com&pwd=123password")
 		req, err := http.NewRequest(http.MethodPost, url, fromValues)
 		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 		assert.Nil(t, err)
@@ -84,14 +89,37 @@ func Test_registration(t *testing.T) {
 	})
 
 }
-func Test_login_verify(t *testing.T) {
-	testUser:=model.User{
-		Email: t.Name(),
-		Password: t.Name(),
+func Test_parse_data(t *testing.T) {
+	tests := []struct {
+		name string
+		uname string
+		pwd string
+		user *model.User
+		wantErr bool
+		err error
+	}{
+		{
+			name: "valid parse",
+			uname: t.Name(),
+			pwd:  "123"+t.Name(),
+			user: &model.User{},
+			wantErr: false,
+		},
+		{
+			name: "invalid parse",
+			uname: t.Name(),
+			pwd: "",
+			user: &model.User{},
+			wantErr: true,
+		},
 	}
-	t.Run("should validate the incoming parameters from login", func(t *testing.T) {
-		got,err:=testUser.IsValid()
-		assert.Nil(t, err)
-		assert.True(t, got)
-	})
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			err:=parseFormData(test.uname, test.pwd,test.user)
+			if test.wantErr && err==nil {
+				t.Fatal("expected to fail")
+			}
+		})
+	}
 }
