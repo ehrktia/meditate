@@ -7,31 +7,33 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/meditate/pkg/model"
 )
+func parseFormData(name ,password string,user *model.User) error {
+	user.Email=name
+	user.Password=password
+	if err:=user.IsValid();err!=nil {
+		return err
+	}
+	return nil
+}
 
 func loginHandler(c *gin.Context) {
-	u := &model.User{}
-	u.Email = c.PostForm("username")
-	u.Password = c.PostForm("password")
-	 valid,validErr:=u.IsValid()
-	 if !valid {
+	u:=new(model.User)
+	if err:=parseFormData(c.PostForm("username"), c.PostForm("password"), u);err!=nil {
 		 c.JSON(http.StatusNotAcceptable, gin.H{
-			 "user":u.Email,
-			 "error": validErr.Error(),
+			 "username":u.Email,
+			 "error": err,
 		 })
 	 }
 	c.JSON(http.StatusOK,nil)
 }
 func registerHandler(c *gin.Context) {
-	u:=&model.User{}
-	u.Email=c.PostForm("email")
-	u.Password=c.PostForm("pwd")
-	valid,validErr:= u.IsValid()
-	if !valid {
+	u:=new(model.User)
+	if err:=parseFormData(c.PostForm("email"), c.PostForm("pwd"), u);err!=nil {
 		 c.JSON(http.StatusNotAcceptable, gin.H{
-			 "user":u.Email,
-			 "error": validErr.Error(),
+			 "username":u.Email,
+			 "error": err,
 		 })
-	}
+	 }
 	c.JSON(http.StatusOK, nil)
 }
 
