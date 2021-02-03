@@ -30,30 +30,31 @@ func Test_create_new_server(t *testing.T) {
 		}
 	})
 }
-func Test_run(t *testing.T) {
-	server, err := NewHTTPServer()
+func Test_routes(t *testing.T) {
+	s, err := NewHTTPServer()
 	assert.Nil(t, err)
+	t.Run("should add routes to server", func(t *testing.T) {
+		assert.Nil(t, s.RegisterRoutes())
+	})
+}
+func Test_run(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	s, err := NewHTTPServer()
+	assert.Nil(t, err)
 	t.Run("should start server", func(t *testing.T) {
 		errCh := make(chan error, 1)
 		go func() {
-			if err := server.Run(ctx); err != nil {
+			err := s.Run(ctx)
+			if err != nil {
 				errCh <- err
 			}
 		}()
 		select {
 		case e := <-errCh:
 			t.Fatal(e)
-		case <-time.After(1 * time.Second):
-			cancel()
+		case <-time.After(2 * time.Second):
 			t.Log("completed")
 		}
-	})
-}
-func Test_routes(t *testing.T) {
-	s, err := NewHTTPServer()
-	assert.Nil(t, err)
-	t.Run("should add routes to server", func(t *testing.T) {
-		assert.Nil(t, s.RegisterRoutes())
 	})
 }

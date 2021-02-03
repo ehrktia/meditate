@@ -1,11 +1,11 @@
 package httpserver
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"net/http"
-	"strings"
 	"testing"
 	"time"
 
@@ -13,113 +13,55 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func Test_routing(t *testing.T) {
+func Test_handler_response(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
-	t.Run("respond to POST to login route", func(t *testing.T) {
-		serv, err := NewHTTPServer()
+	defer cancel()
+	s, err := NewHTTPServer()
+	assert.Nil(t, err)
+	err = s.RegisterRoutes()
+	assert.Nil(t, err)
+	errCh := make(chan error, 1)
+	go func() {
+		err := s.Run(ctx)
 		if err != nil {
-			t.Fatal(err)
+			errCh <- err
 		}
-		if err := serv.RegisterRoutes(); err != nil {
-			t.Fatal(err)
-		}
-		errCh := make(chan error, 1)
-		go func() {
-			err := serv.Run(ctx)
-			if err != nil {
-				errCh <- err
-			}
-		}()
-		client := http.DefaultClient
-		url := fmt.Sprintf("http://%s:%s/%s", "0.0.0.0", defaultPort, "login")
-		fromValues := strings.NewReader("username=testuser@test.com&password=123password")
-		req, err := http.NewRequest(http.MethodPost, url, fromValues)
-		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	}()
+	t.Run("should respond to GET home path", func(t *testing.T) {
+		url := fmt.Sprintf("http://%s/", defaultPort)
+		req, err := http.NewRequest(http.MethodGet, url, nil)
 		assert.Nil(t, err)
-		resp, err := client.Do(req)
-		assert.Nil(t, err)
-		if resp.StatusCode != http.StatusOK {
-			bbytes, err := ioutil.ReadAll(resp.Body)
-			assert.Nil(t, err)
-			t.Logf("resp body: %+v", string(bbytes))
-		}
-		select {
-		case e := <-errCh:
-			t.Fatal(e)
-		case <-time.After(2 * time.Second):
-			t.Log("time out")
-			cancel()
-		}
-	})
-
-}
-func Test_registration(t *testing.T) {
-	ctx, cancel := context.WithCancel(context.Background())
-	t.Run("should get user reg values", func(t *testing.T) {
-		serv, err := NewHTTPServer()
-		if err != nil {
-			t.Fatal(err)
-		}
-		if err := serv.RegisterRoutes(); err != nil {
-			t.Fatal(err)
-		}
-		errCh := make(chan error, 1)
-		go func() {
-			err := serv.Run(ctx)
-			if err != nil {
-				errCh <- err
-			}
-		}()
-		client := http.DefaultClient
-		url := fmt.Sprintf("http://%s:%s/%s", "127.0.0.1", defaultPort, "register")
-		fromValues := strings.NewReader("email=test@test.com&pwd=123password")
-		req, err := http.NewRequest(http.MethodPost, url, fromValues)
-		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-		assert.Nil(t, err)
-		resp, err := client.Do(req)
+		cli := http.DefaultClient
+		resp, err := cli.Do(req)
 		assert.Nil(t, err)
 		assert.Equal(t, http.StatusOK, resp.StatusCode)
 		select {
 		case e := <-errCh:
 			t.Fatal(e)
-		case <-time.After(2 * time.Second):
-			t.Log("time out")
-			cancel()
+		case <-time.After(4 * time.Second):
+			t.Log("completed")
+		}
+	})
+	t.Run("should respond to POST login route", func(t *testing.T) {
+		url := fmt.Sprintf("http://%s/%s", defaultPort, "login")
+		bbytes, err := json.Marshal(&model.User{
+			Email:    "test@test.com",
+			Password: "test!@£A",
+		})
+		assert.Nil(t, err)
+		body := bytes.NewReader(bbytes)
+		req, err := http.NewRequest(http.MethodPost, url, body)
+		assert.Nil(t, err)
+		cli := http.DefaultClient
+		resp, err := cli.Do(req)
+		assert.Nil(t, err)
+		assert.Equal(t, http.StatusOK, resp.StatusCode)
+		select {
+		case e := <-errCh:
+			t.Fatal(e)
+		case <-time.After(4 * time.Second):
+			t.Log("completed")
 		}
 	})
 
-}
-func Test_parse_data(t *testing.T) {
-	tests := []struct {
-		name    string
-		uname   string
-		pwd     string
-		user    *model.User
-		wantErr bool
-		err     error
-	}{
-		{
-			name:    "valid parse",
-			uname:   t.Name(),
-			pwd:     "123" + t.Name(),
-			user:    &model.User{},
-			wantErr: false,
-		},
-		{
-			name:    "invalid parse",
-			uname:   t.Name(),
-			pwd:     "",
-			user:    &model.User{},
-			wantErr: true,
-		},
-	}
-
-	for _, test := range tests {
-		t.Run(test.name, func(t *testing.T) {
-			err := parseFormData(test.uname, test.pwd, test.user)
-			if test.wantErr && err == nil {
-				t.Fatal("expected to fail")
-			}
-		})
-	}
 }
