@@ -7,33 +7,34 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/meditate/pkg/model"
 )
-func parseFormData(name ,password string,user *model.User) error {
-	user.Email=name
-	user.Password=password
-	if err:=user.IsValid();err!=nil {
+
+func parseFormData(name, password string, user *model.User) error {
+	user.Email = name
+	user.Password = password
+	if err := user.IsValid(); err != nil {
 		return err
 	}
 	return nil
 }
 
 func loginHandler(c *gin.Context) {
-	u:=new(model.User)
-	if err:=parseFormData(c.PostForm("username"), c.PostForm("password"), u);err!=nil {
-		 c.JSON(http.StatusNotAcceptable, gin.H{
-			 "username":u.Email,
-			 "error": err,
-		 })
-	 }
-	c.JSON(http.StatusOK,nil)
+	u := new(model.User)
+	if err := parseFormData(c.PostForm("username"), c.PostForm("password"), u); err != nil {
+		c.JSON(http.StatusNotAcceptable, gin.H{
+			"username": u.Email,
+			"error":    err,
+		})
+	}
+	c.JSON(http.StatusOK, nil)
 }
 func registerHandler(c *gin.Context) {
-	u:=new(model.User)
-	if err:=parseFormData(c.PostForm("email"), c.PostForm("pwd"), u);err!=nil {
-		 c.JSON(http.StatusNotAcceptable, gin.H{
-			 "username":u.Email,
-			 "error": err,
-		 })
-	 }
+	u := new(model.User)
+	if err := parseFormData(c.PostForm("email"), c.PostForm("pwd"), u); err != nil {
+		c.JSON(http.StatusNotAcceptable, gin.H{
+			"username": u.Email,
+			"error":    err,
+		})
+	}
 	c.JSON(http.StatusOK, nil)
 }
 
@@ -54,4 +55,3 @@ func (h *httpServer) register(routes *routeList) error {
 	}
 	return nil
 }
-

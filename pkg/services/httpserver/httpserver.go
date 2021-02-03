@@ -11,8 +11,8 @@ import (
 )
 
 const (
-	httpPort    = "HTTPPORT"
-	defaultPort = "0.0.0.0:8033"
+	httpPort    = "PORT"
+	defaultPort = "8080"
 )
 
 type httpServer struct {
@@ -26,7 +26,7 @@ func NewHTTPServer() (*httpServer, error) {
 	gin.SetMode(gin.ReleaseMode)
 	r := gin.New()
 	if port = os.Getenv(httpPort); port == "" {
-		port = defaultPort
+		port = ":" + defaultPort
 	}
 	log, err := logging.NewLogger()
 	if err != nil {
