@@ -31,15 +31,15 @@ func Test_routing(t *testing.T) {
 			}
 		}()
 		client := http.DefaultClient
-		url := fmt.Sprintf("http://%s/%s", defaultPort, "login")
+		url := fmt.Sprintf("http://%s:%s/%s", "0.0.0.0", defaultPort, "login")
 		fromValues := strings.NewReader("username=testuser@test.com&password=123password")
 		req, err := http.NewRequest(http.MethodPost, url, fromValues)
 		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 		assert.Nil(t, err)
 		resp, err := client.Do(req)
 		assert.Nil(t, err)
-		if resp.StatusCode!=http.StatusOK {
-			bbytes,err:=ioutil.ReadAll(resp.Body)
+		if resp.StatusCode != http.StatusOK {
+			bbytes, err := ioutil.ReadAll(resp.Body)
 			assert.Nil(t, err)
 			t.Logf("resp body: %+v", string(bbytes))
 		}
@@ -71,7 +71,7 @@ func Test_registration(t *testing.T) {
 			}
 		}()
 		client := http.DefaultClient
-		url := fmt.Sprintf("http://%s/%s", defaultPort, "register")
+		url := fmt.Sprintf("http://%s:%s/%s", "127.0.0.1", defaultPort, "register")
 		fromValues := strings.NewReader("email=test@test.com&pwd=123password")
 		req, err := http.NewRequest(http.MethodPost, url, fromValues)
 		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
@@ -91,33 +91,33 @@ func Test_registration(t *testing.T) {
 }
 func Test_parse_data(t *testing.T) {
 	tests := []struct {
-		name string
-		uname string
-		pwd string
-		user *model.User
+		name    string
+		uname   string
+		pwd     string
+		user    *model.User
 		wantErr bool
-		err error
+		err     error
 	}{
 		{
-			name: "valid parse",
-			uname: t.Name(),
-			pwd:  "123"+t.Name(),
-			user: &model.User{},
+			name:    "valid parse",
+			uname:   t.Name(),
+			pwd:     "123" + t.Name(),
+			user:    &model.User{},
 			wantErr: false,
 		},
 		{
-			name: "invalid parse",
-			uname: t.Name(),
-			pwd: "",
-			user: &model.User{},
+			name:    "invalid parse",
+			uname:   t.Name(),
+			pwd:     "",
+			user:    &model.User{},
 			wantErr: true,
 		},
 	}
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			err:=parseFormData(test.uname, test.pwd,test.user)
-			if test.wantErr && err==nil {
+			err := parseFormData(test.uname, test.pwd, test.user)
+			if test.wantErr && err == nil {
 				t.Fatal("expected to fail")
 			}
 		})
