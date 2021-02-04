@@ -2,6 +2,7 @@ package httpserver
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"os"
 
@@ -12,7 +13,7 @@ import (
 
 const (
 	httpPort    = "PORT"
-	defaultPort = "0.0.0.0:8080"
+	defaultPort = "8083"
 )
 
 type httpServer struct {
@@ -32,11 +33,12 @@ func NewHTTPServer() (*httpServer, error) {
 	if err != nil {
 		return nil, err
 	}
+	log.Info("server initalised in address ",port)
 	return &httpServer{
 		engine: r,
 		logger: log,
 		server: &http.Server{
-			Addr:    port,
+			Addr:    fmt.Sprintf(":%s", port),
 			Handler: r,
 		},
 	}, nil
@@ -44,7 +46,7 @@ func NewHTTPServer() (*httpServer, error) {
 func (s *httpServer) Run(ctx context.Context) error {
 	go func() {
 		<-ctx.Done()
-		if err := s.server.Shutdown(ctx); err != nil || err != ctx.Err() && err != http.ErrServerClosed {
+		if err := s.server.Shutdown(ctx); err != nil {
 			s.logger.Errorf("error closing server: %v", err)
 		}
 	}()
