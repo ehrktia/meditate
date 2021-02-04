@@ -28,7 +28,7 @@ func Test_handler_response(t *testing.T) {
 		}
 	}()
 	t.Run("should respond to GET home path", func(t *testing.T) {
-		url := fmt.Sprintf("http://%s/", defaultPort)
+		url := fmt.Sprintf("http://%s:%s/", "0.0.0.0",defaultPort)
 		req, err := http.NewRequest(http.MethodGet, url, nil)
 		assert.Nil(t, err)
 		cli := http.DefaultClient
@@ -38,12 +38,12 @@ func Test_handler_response(t *testing.T) {
 		select {
 		case e := <-errCh:
 			t.Fatal(e)
-		case <-time.After(4 * time.Second):
+		case <-time.After(2 * time.Second):
 			t.Log("completed")
 		}
 	})
 	t.Run("should respond to POST login route", func(t *testing.T) {
-		url := fmt.Sprintf("http://%s/%s", defaultPort, "login")
+		url := fmt.Sprintf("http://%s:%s/%s", "0.0.0.0",defaultPort,"login")
 		bbytes, err := json.Marshal(&model.User{
 			Email:    "test@test.com",
 			Password: "test!@£A",
@@ -59,7 +59,7 @@ func Test_handler_response(t *testing.T) {
 		select {
 		case e := <-errCh:
 			t.Fatal(e)
-		case <-time.After(4 * time.Second):
+		case <-time.After(2 * time.Second):
 			t.Log("completed")
 		}
 	})
