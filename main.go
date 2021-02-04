@@ -9,8 +9,8 @@ import (
 
 func main() {
 	ctx, cancel := context.WithCancel(context.Background())
-	log,err:=logging.NewLogger()
-	if err!=nil {
+	log, err := logging.NewLogger()
+	if err != nil {
 		cancel()
 		panic(err)
 	}
@@ -24,7 +24,7 @@ func main() {
 		log.Errorf("error registering server routes: %v", err)
 	}
 	log.Info("starting app server..")
-	if err:=server.Run(ctx);err!=nil {
+	if err := server.Run(ctx); err != nil {
 		log.Errorf("error starting server", err)
 	}
 }

@@ -28,7 +28,7 @@ func Test_handler_response(t *testing.T) {
 		}
 	}()
 	t.Run("should respond to GET home path", func(t *testing.T) {
-		url := fmt.Sprintf("http://%s:%s/", "0.0.0.0",defaultPort)
+		url := fmt.Sprintf("http://%s:%s/", "0.0.0.0", defaultPort)
 		req, err := http.NewRequest(http.MethodGet, url, nil)
 		assert.Nil(t, err)
 		cli := http.DefaultClient
@@ -43,7 +43,7 @@ func Test_handler_response(t *testing.T) {
 		}
 	})
 	t.Run("should respond to POST login route", func(t *testing.T) {
-		url := fmt.Sprintf("http://%s:%s/%s", "0.0.0.0",defaultPort,"login")
+		url := fmt.Sprintf("http://%s:%s/%s", "0.0.0.0", defaultPort, "login")
 		bbytes, err := json.Marshal(&model.User{
 			Email:    "test@test.com",
 			Password: "test!@£A",
