@@ -12,12 +12,12 @@ import (
 
 const (
 	httpPort    = "PORT"
-	defaultPort = "8080"
+	defaultPort = "0.0.0.0:8080"
 )
 
 type httpServer struct {
-	logger *zap.SugaredLogger
 	engine *gin.Engine
+	logger *zap.SugaredLogger
 	server *http.Server
 }
 
@@ -26,7 +26,7 @@ func NewHTTPServer() (*httpServer, error) {
 	gin.SetMode(gin.ReleaseMode)
 	r := gin.New()
 	if port = os.Getenv(httpPort); port == "" {
-		port = ":" + defaultPort
+		port = defaultPort
 	}
 	log, err := logging.NewLogger()
 	if err != nil {
@@ -41,19 +41,19 @@ func NewHTTPServer() (*httpServer, error) {
 		},
 	}, nil
 }
-
-func (h *httpServer) Run(ctx context.Context) error {
+func (s *httpServer) Run(ctx context.Context) error {
 	go func() {
 		<-ctx.Done()
-		if err := h.server.Shutdown(ctx); err != nil && err != ctx.Err() {
-			h.logger.Error(err)
+		if err := s.server.Shutdown(ctx); err != nil || err != ctx.Err() && err != http.ErrServerClosed {
+			s.logger.Errorf("error closing server: %v", err)
 		}
 	}()
-	if err := h.server.ListenAndServe(); err != nil {
+	if err := s.server.ListenAndServe(); err != nil {
 		return err
 	}
 	return nil
 }
+
 func (h *httpServer) RegisterRoutes() error {
 	rList := createRouteList()
 	rList.addRoutes()

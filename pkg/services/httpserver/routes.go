@@ -21,18 +21,16 @@ func createRouteList() *routeList {
 }
 
 func (r *routeList) addRoutes() {
-	r.routeList = append(r.routeList, &routes{
-		path:    "/login",
-		method:  http.MethodPost,
-		handler: loginHandler,
-	},
+	r.routeList = append(r.routeList,
 		&routes{
-			path:    "/register",
+			path:    "/",
+			method:  http.MethodGet,
+			handler: homeHandler,
+		},
+		&routes{
+			path:    "/login",
 			method:  http.MethodPost,
-			handler: registerHandler,
+			handler: loginHandler,
 		},
 	)
-}
-func (r *routeList) addRoute(route routes) {
-	r.routeList = append(r.routeList, &route)
 }

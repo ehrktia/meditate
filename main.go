@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/meditate/pkg/services/httpserver"
-	"golang.org/x/sync/errgroup"
 )
 
 func main() {
@@ -17,11 +16,7 @@ func main() {
 	if err := server.RegisterRoutes(); err != nil {
 		panic(err)
 	}
-	e, ctxerrgroup := errgroup.WithContext(ctx)
-	e.Go(func() error {
-		return server.Run(ctxerrgroup)
-	})
-	if e.Wait() != nil {
-		panic(e.Wait().Error())
+	if err := server.Run(ctx); err != nil {
+		panic(err)
 	}
 }

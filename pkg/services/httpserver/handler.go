@@ -8,31 +8,17 @@ import (
 	"github.com/meditate/pkg/model"
 )
 
-func parseFormData(name, password string, user *model.User) error {
-	user.Email = name
-	user.Password = password
-	if err := user.IsValid(); err != nil {
-		return err
-	}
-	return nil
+func homeHandler(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{
+		"msg": "welcome",
+	})
 }
 
 func loginHandler(c *gin.Context) {
 	u := new(model.User)
-	if err := parseFormData(c.PostForm("username"), c.PostForm("password"), u); err != nil {
-		c.JSON(http.StatusNotAcceptable, gin.H{
-			"username": u.Email,
-			"error":    err,
-		})
-	}
-	c.JSON(http.StatusOK, nil)
-}
-func registerHandler(c *gin.Context) {
-	u := new(model.User)
-	if err := parseFormData(c.PostForm("email"), c.PostForm("pwd"), u); err != nil {
-		c.JSON(http.StatusNotAcceptable, gin.H{
-			"username": u.Email,
-			"error":    err,
+	if err := c.ShouldBindJSON(u); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": err,
 		})
 	}
 	c.JSON(http.StatusOK, nil)
@@ -45,12 +31,8 @@ func (h *httpServer) register(routes *routeList) error {
 			h.engine.GET(route.path, route.handler)
 		case http.MethodPost:
 			h.engine.POST(route.path, route.handler)
-		case http.MethodDelete:
-			h.engine.DELETE(route.path, route.handler)
-		case http.MethodPatch:
-			h.engine.PATCH(route.path, route.handler)
 		default:
-			return fmt.Errorf("not a valid http action")
+			return fmt.Errorf("not a valid method")
 		}
 	}
 	return nil
