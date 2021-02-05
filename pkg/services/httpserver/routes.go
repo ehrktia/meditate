@@ -35,7 +35,7 @@ func (r *routeList) addRoutes() {
 		&routes{
 			path:    "/logout",
 			method:  http.MethodPost,
-			handler: loginHandler,
+			handler: logout,
 		},
 	)
 }
