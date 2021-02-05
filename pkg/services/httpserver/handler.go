@@ -37,3 +37,12 @@ func (h *httpServer) register(routes *routeList) error {
 	}
 	return nil
 }
+func logout(c *gin.Context) {
+	u := new(model.User)
+	if err := c.ShouldBindJSON(u); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": err,
+		})
+	}
+	c.JSON(http.StatusOK, nil)
+}
