@@ -8,3 +8,4 @@ app for self improvement
  Todo:
       * add front end
       * logout handler
+      * wire up routes for all handlers
