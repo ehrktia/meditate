@@ -45,8 +45,7 @@ func Test_handler_response(t *testing.T) {
 	t.Run("should respond to POST login route", func(t *testing.T) {
 		url := fmt.Sprintf("http://%s:%s/%s", "0.0.0.0", defaultPort, "login")
 		bbytes, err := json.Marshal(&model.User{
-			Email:    "test@test.com",
-			Password: "test!@£A",
+			Token: "testToke,n",
 		})
 		assert.Nil(t, err)
 		body := bytes.NewReader(bbytes)

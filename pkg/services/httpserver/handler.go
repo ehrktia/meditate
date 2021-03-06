@@ -10,15 +10,14 @@ import (
 
 func homeHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
-		"msg": "welcome",
+		"status":"ok",
 	})
 }
 
 func loginHandler(c *gin.Context) {
-	u := new(model.User)
-	if err := c.ShouldBindJSON(u); err != nil {
+	if err:=c.BindJSON(&model.User{});err!=nil{
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error": err,
+			"error":err.Error(),
 		})
 	}
 	c.JSON(http.StatusOK, nil)
