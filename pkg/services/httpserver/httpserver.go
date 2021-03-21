@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/meditate/pkg/logging"
 	"go.uber.org/zap"
@@ -26,6 +27,12 @@ func NewHTTPServer() (*httpServer, error) {
 	var port string
 	gin.SetMode(gin.ReleaseMode)
 	r := gin.New()
+	config := cors.DefaultConfig()
+	config.AllowMethods=[]string{"GET","POST","OPTIONS"}
+	config.AllowOrigins = []string{"*"}
+	config.AllowCredentials=true
+	config.AllowHeaders=[]string{"Content-Type"}
+	r.Use(cors.New(config))
 	if port = os.Getenv(httpPort); port == "" {
 		port = defaultPort
 	}

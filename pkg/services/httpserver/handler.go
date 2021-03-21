@@ -10,17 +10,22 @@ import (
 
 func homeHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
-		"status":"ok",
+		"status": "ok",
 	})
 }
 
 func loginHandler(c *gin.Context) {
-	if err:=c.BindJSON(&model.User{});err!=nil{
+	userToken:=new(model.User)
+	if err:=c.ShouldBind(userToken);err!=nil{
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error":err.Error(),
+			"status":"not ok",
+			"token": userToken.IDToken,
+			"error": err.Error(),
 		})
 	}
-	c.JSON(http.StatusOK, nil)
+	c.JSON(http.StatusOK, gin.H{
+		"token":userToken.IDToken,
+	})
 }
 
 func (h *httpServer) register(routes *routeList) error {
