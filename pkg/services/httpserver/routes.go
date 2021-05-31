@@ -15,8 +15,6 @@ type routeList struct {
 	routeList []*routes
 }
 
-
-
 func (r *routeList) addRoutes() {
 	r.routeList = append(r.routeList,
 		&routes{

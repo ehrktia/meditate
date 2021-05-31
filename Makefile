@@ -17,6 +17,9 @@ format:
 .PHONY: lint
 lint:
 	golangci-lint run
+.PHONY: sec
+sec:
+	gosec ./...
 .PHONY: clean
 clean:
 	$(GOCLEAN)
