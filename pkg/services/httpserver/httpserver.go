@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/meditate/pkg/logging"
 	"go.uber.org/zap"
@@ -24,24 +25,36 @@ type httpServer struct {
 
 func NewHTTPServer() (*httpServer, error) {
 	var port string
-	gin.SetMode(gin.ReleaseMode)
-	r := gin.New()
-	if port = os.Getenv(httpPort); port == "" {
-		port = defaultPort
-	}
 	log, err := logging.NewLogger()
 	if err != nil {
 		return nil, err
 	}
+	gin.SetMode(gin.ReleaseMode)
+	r := gin.New()
+	config := cors.DefaultConfig()
+	config.AllowMethods=[]string{"GET","POST","OPTIONS"}
+	config.AllowOrigins = []string{"*"}
+	config.AllowCredentials=true
+	config.AllowHeaders=[]string{"Content-Type"}
+	r.Use(cors.New(config))
+
+	if port = os.Getenv(httpPort); port == "" {
+		port = defaultPort
+	}
 	log.Info("server initalised in address ", port)
-	return &httpServer{
+	h:=&httpServer{
 		engine: r,
 		logger: log,
 		server: &http.Server{
-			Addr:    fmt.Sprintf(":%s", port),
+			Addr:    fmt.Sprintf("0.0.0.0:%s", port),
 			Handler: r,
 		},
-	}, nil
+	}
+	if err:=h.RegisterRoutes();err!=nil{
+		return nil,err
+	}
+	log.Info("routes registration completed")
+	return h, nil
 }
 func (s *httpServer) Run(ctx context.Context) error {
 	go func() {
@@ -57,7 +70,7 @@ func (s *httpServer) Run(ctx context.Context) error {
 }
 
 func (h *httpServer) RegisterRoutes() error {
-	rList := createRouteList()
+	rList := &routeList{routeList: []*routes{}}
 	rList.addRoutes()
 	return h.register(rList)
 }

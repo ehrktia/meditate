@@ -7,7 +7,7 @@ import (
 )
 
 func Test_add_new_route(t *testing.T) {
-	r := createRouteList()
+	r := &routeList{routeList: []*routes{}}
 	t.Run("should create a new route list", func(t *testing.T) {
 		assert.NotEmpty(t, r)
 	})

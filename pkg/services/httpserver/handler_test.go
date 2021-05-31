@@ -1,66 +1,48 @@
 package httpserver
 
 import (
-	"bytes"
-	"context"
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"testing"
-	"time"
 
-	"github.com/meditate/pkg/model"
-	"github.com/stretchr/testify/assert"
+	"github.com/steinfletcher/apitest"
+	"github.com/stretchr/testify/require"
 )
 
 func Test_handler_response(t *testing.T) {
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-	s, err := NewHTTPServer()
-	assert.Nil(t, err)
-	err = s.RegisterRoutes()
-	assert.Nil(t, err)
-	errCh := make(chan error, 1)
-	go func() {
-		err := s.Run(ctx)
-		if err != nil {
-			errCh <- err
-		}
-	}()
+	r:=require.New(t)
+	testServer,err:=NewHTTPServer()
+	r.Nil(err, "error initializing server for test")
 	t.Run("should respond to GET home path", func(t *testing.T) {
-		url := fmt.Sprintf("http://%s:%s/", "0.0.0.0", defaultPort)
-		req, err := http.NewRequest(http.MethodGet, url, nil)
-		assert.Nil(t, err)
-		cli := http.DefaultClient
-		resp, err := cli.Do(req)
-		assert.Nil(t, err)
-		assert.Equal(t, http.StatusOK, resp.StatusCode)
-		select {
-		case e := <-errCh:
-			t.Fatal(e)
-		case <-time.After(2 * time.Second):
-			t.Log("completed")
-		}
+		url:=buildURL()
+		expectedResult:=`{"status":"ok"}`
+		apitest.New(t.Name()).
+		Debug().
+		Handler(testServer.engine).
+		Get(url).
+		Expect(t).
+		Body(expectedResult).
+		Status(http.StatusOK).
+		End()
 	})
 	t.Run("should respond to POST login route", func(t *testing.T) {
-		url := fmt.Sprintf("http://%s:%s/%s", "0.0.0.0", defaultPort, "login")
-		bbytes, err := json.Marshal(&model.User{
-			Token: "testToke,n",
-		})
-		assert.Nil(t, err)
-		body := bytes.NewReader(bbytes)
-		req, err := http.NewRequest(http.MethodPost, url, body)
-		assert.Nil(t, err)
-		cli := http.DefaultClient
-		resp, err := cli.Do(req)
-		assert.Nil(t, err)
-		assert.Equal(t, http.StatusOK, resp.StatusCode)
-		select {
-		case e := <-errCh:
-			t.Fatal(e)
-		case <-time.After(2 * time.Second):
-			t.Log("completed")
-		}
+		r.Nil(err, "error marshalling data for req")
+		respBody:=`{"token":"testToken!@1"}`
+		url:=buildURL("login")
+		 apitest.New(t.Name()).
+		 Debug().
+		 Handler(testServer.engine).
+		 Post(url).
+		 FormData("idtoken","testToken!@1").
+		 Expect(t).
+		 Body(respBody).
+		 Status(http.StatusOK).End()
 	})
-
 }
+func buildURL(path ...string)string  {
+	if len(path)<1{
+	return fmt.Sprintf("http://0.0.0.0:%s/", defaultPort)
+	}
+	return fmt.Sprintf("http://0.0.0.0:%s/%s", defaultPort,path[0])
+}
+
