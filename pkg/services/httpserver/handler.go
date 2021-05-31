@@ -7,14 +7,24 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/meditate/pkg/model"
 )
-
-func homeHandler(c *gin.Context) {
+func homeHandler() gin.HandlerFunc {
+	return func(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"status": "ok",
 	})
+	}
 }
 
-func loginHandler(c *gin.Context) {
+func logoutHandler() gin.HandlerFunc {
+	return func(c *gin.Context) {
+			c.JSON(http.StatusOK,gin.H{
+				"status":"logout successful",
+			})
+	}
+}
+
+func loginHandler() gin.HandlerFunc {
+	return func(c *gin.Context) {
 	userToken:=new(model.User)
 	if err:=c.ShouldBind(userToken);err!=nil{
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -26,7 +36,9 @@ func loginHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"token":userToken.IDToken,
 	})
+	}
 }
+
 
 func (h *httpServer) register(routes *routeList) error {
 	for _, route := range routes.routeList {

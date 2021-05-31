@@ -15,22 +15,23 @@ type routeList struct {
 	routeList []*routes
 }
 
-func createRouteList() *routeList {
-	r := []*routes{}
-	return &routeList{routeList: r}
-}
 
 func (r *routeList) addRoutes() {
 	r.routeList = append(r.routeList,
 		&routes{
 			path:    "/",
 			method:  http.MethodGet,
-			handler: homeHandler,
+			handler: homeHandler(),
 		},
 		&routes{
 			path:    "/login",
 			method:  http.MethodPost,
-			handler: loginHandler,
+			handler: loginHandler(),
+		},
+		&routes{
+			path:    "/logout",
+			method:  http.MethodPost,
+			handler: logoutHandler(),
 		},
 	)
 }
