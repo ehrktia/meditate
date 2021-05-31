@@ -37,6 +37,7 @@ func NewHTTPServer() (*httpServer, error) {
 	config.AllowCredentials=true
 	config.AllowHeaders=[]string{"Content-Type"}
 	r.Use(cors.New(config))
+
 	if port = os.Getenv(httpPort); port == "" {
 		port = defaultPort
 	}
