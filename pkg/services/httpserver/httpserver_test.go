@@ -12,7 +12,7 @@ import (
 func Test_create_new_server(t *testing.T) {
 	customPort := "9399"
 	t.Run("should create new server", func(t *testing.T) {
-	server, err := NewHTTPServer()
+		server, err := NewHTTPServer()
 		assert.Nil(t, err)
 		assert.NotNil(t, server)
 	})

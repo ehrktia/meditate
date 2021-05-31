@@ -32,17 +32,17 @@ func NewHTTPServer() (*httpServer, error) {
 	gin.SetMode(gin.ReleaseMode)
 	r := gin.New()
 	config := cors.DefaultConfig()
-	config.AllowMethods=[]string{"GET","POST","OPTIONS"}
+	config.AllowMethods = []string{"GET", "POST", "OPTIONS"}
 	config.AllowOrigins = []string{"*"}
-	config.AllowCredentials=true
-	config.AllowHeaders=[]string{"Content-Type"}
+	config.AllowCredentials = true
+	config.AllowHeaders = []string{"Content-Type"}
 	r.Use(cors.New(config))
 
 	if port = os.Getenv(httpPort); port == "" {
 		port = defaultPort
 	}
 	log.Info("server initalised in address ", port)
-	h:=&httpServer{
+	h := &httpServer{
 		engine: r,
 		logger: log,
 		server: &http.Server{
@@ -50,8 +50,8 @@ func NewHTTPServer() (*httpServer, error) {
 			Handler: r,
 		},
 	}
-	if err:=h.RegisterRoutes();err!=nil{
-		return nil,err
+	if err := h.RegisterRoutes(); err != nil {
+		return nil, err
 	}
 	log.Info("routes registration completed")
 	return h, nil
