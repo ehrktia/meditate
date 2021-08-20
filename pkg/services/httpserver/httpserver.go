@@ -8,7 +8,7 @@ import (
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	"github.com/meditate/pkg/logging"
+	"github.com/web-alytics/meditate/pkg/logging"
 )
 
 const (

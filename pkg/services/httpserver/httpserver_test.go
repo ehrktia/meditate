@@ -8,8 +8,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang/mock/gomock"
-	mock "github.com/meditate/pkg/logging/mocks"
 	"github.com/stretchr/testify/assert"
+	mock "github.com/web-alytics/meditate/pkg/logging/mocks"
 )
 
 func Test_create_new_server(t *testing.T) {

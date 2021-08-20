@@ -4,8 +4,8 @@ import (
 	"context"
 
 	"github.com/gin-gonic/gin"
-	"github.com/meditate/pkg/logging"
-	"github.com/meditate/pkg/services/httpserver"
+	"github.com/web-alytics/meditate/pkg/logging"
+	"github.com/web-alytics/meditate/pkg/services/httpserver"
 	"go.uber.org/zap"
 )
 

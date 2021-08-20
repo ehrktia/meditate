@@ -1,4 +1,4 @@
-module github.com/meditate
+module github.com/web-alytics/meditate
 
 go 1.15
 

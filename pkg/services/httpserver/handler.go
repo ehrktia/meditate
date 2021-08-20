@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/meditate/pkg/model"
+	"github.com/web-alytics/meditate/pkg/model"
 )
 
 func homeHandler() gin.HandlerFunc {
