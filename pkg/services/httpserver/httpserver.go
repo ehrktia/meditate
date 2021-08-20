@@ -6,10 +6,9 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/meditate/pkg/logging"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	"github.com/meditate/pkg/logging"
-	"go.uber.org/zap"
 )
 
 const (
@@ -19,49 +18,45 @@ const (
 
 type httpServer struct {
 	Engine *gin.Engine
-	Logger *zap.SugaredLogger
+	Logger logging.Logger
 	Server *http.Server
 }
 
-func NewHTTPServer() (*httpServer, error) {
+func NewHTTPServer(log logging.Logger,
+engine *gin.Engine) (*httpServer, error) {
 	var port string
-	log, err := logging.NewLogger()
-	if err != nil {
-		return nil, err
-	}
-	gin.SetMode(gin.ReleaseMode)
-	r := gin.New()
 	config := cors.DefaultConfig()
 	config.AllowMethods = []string{"GET", "POST", "OPTIONS"}
 	config.AllowOrigins = []string{"*"}
 	config.AllowCredentials = true
 	config.AllowHeaders = []string{"Content-Type"}
-	r.Use(cors.New(config))
+	engine.Use(cors.New(config))
 
 	if port = os.Getenv(httpPort); port == "" {
 		port = defaultPort
 	}
-	log.Info("server initalised in address ", port)
 	h := &httpServer{
-		Engine: r,
+		Engine: engine,
 		Logger: log,
 		Server: &http.Server{
 			Addr:    fmt.Sprintf(":%s", port),
-			Handler: r,
+			Handler: engine,
 		},
 	}
+	h.Logger.Info("server initalised in address ", port)
 	if err := h.RegisterRoutes(); err != nil {
 		return nil, err
 	}
-	log.Info("routes registration completed")
+	h.Logger.Info("routes registration completed")
 	return h, nil
 }
 func (s *httpServer) Run(ctx context.Context) error {
-	go func() {
+	go func()error {
 		<-ctx.Done()
 		if err := s.Server.Shutdown(ctx); err != nil {
-			s.Logger.Errorf("error closing server: %v", err)
+			return err
 		}
+		return nil
 	}()
 	if err := s.Server.ListenAndServe(); err != nil {
 		return err
