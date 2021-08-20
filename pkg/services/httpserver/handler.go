@@ -29,13 +29,13 @@ func loginHandler() gin.HandlerFunc {
 	}
 }
 
-func (h *httpServer) register(routes *routeList) error {
+func (s *HTTPServer) register(routes *routeList) error {
 	for _, route := range routes.routeList {
 		switch route.method {
 		case http.MethodGet:
-			h.Engine.GET(route.path, route.handler)
+			s.Engine.GET(route.path, route.handler)
 		case http.MethodPost:
-			h.Engine.POST(route.path, route.handler)
+			s.Engine.POST(route.path, route.handler)
 		default:
 			return fmt.Errorf("not a valid method")
 		}

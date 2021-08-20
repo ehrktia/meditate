@@ -16,6 +16,7 @@ format:
 	$(GOFMT) -s -w .
 .PHONY: lint
 lint:
+	golint ./...
 	golangci-lint run
 .PHONY: sec
 sec:

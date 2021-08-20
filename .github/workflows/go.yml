@@ -32,6 +32,8 @@ jobs:
         with:
           # Required: the version of golangci-lint is required and must be specified without patch version: we always use the latest patch version.
           version: v1.29
+          skip-pkg-cache: true
+          skip-build-cache: true
           
 
   test:
@@ -42,7 +44,7 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@v2
       with:
-        go-version: 1.15
+        go-version: 1.16
     -  name: Test
        run: go test -race  ./...
 
@@ -54,7 +56,7 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@v2
       with:
-        go-version: 1.15
+        go-version: 1.16
 
     - name: Build
       run: go build -v ./...

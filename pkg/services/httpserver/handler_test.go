@@ -10,7 +10,7 @@ import (
 )
 
 func Test_Home_Handler(t *testing.T) {
-	newTestServer := &httpServer{
+	newTestServer := &HTTPServer{
 		Engine: gin.Default(),
 		Server: &http.Server{},
 	}
@@ -23,7 +23,7 @@ func Test_Home_Handler(t *testing.T) {
 		End()
 }
 func Test_Login_Handler(t *testing.T) {
-	newTestServer := &httpServer{
+	newTestServer := &HTTPServer{
 		Engine: gin.Default(),
 		Server: &http.Server{},
 	}

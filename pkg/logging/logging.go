@@ -29,6 +29,8 @@ type Logger interface {
 	Panicw(msg string, keysAndValues ...interface{})
 	Fatalw(msg string, keysAndValues ...interface{})
 }
+
+// PkgLogger holds logger for service
 type PkgLogger struct {
 	Logger
 }

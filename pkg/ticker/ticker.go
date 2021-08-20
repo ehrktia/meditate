@@ -13,28 +13,29 @@ const (
 	defaultSessionDuration = "SESSION_DURATION"
 )
 
-type timer struct {
+// Timer holds session and interim timer.
+type Timer struct {
 	sessionDuration              string
 	sessionDurationFormat        time.Duration
 	defaultInterimIntervalFormat time.Duration
 }
 
 // IntialiseTimer starts a timer for provided duration
-func IntialiseTimer() (timer, error) {
+func IntialiseTimer() (Timer, error) {
 	defaultSession := os.Getenv(defaultSessionDuration)
 	duration, err := time.ParseDuration(defaultSession)
 	if err != nil {
-		return timer{}, err
+		return Timer{}, err
 	}
 	defaultInterim := os.Getenv(defaultInterimInterval)
 	defaultDuration, err := time.ParseDuration(defaultInterim)
 	if err != nil {
-		return timer{}, err
+		return Timer{}, err
 	}
 	if duration.Seconds() < defaultDuration.Seconds() {
-		return timer{}, fmt.Errorf("error session time can not be lower than defaultInterimInterval")
+		return Timer{}, fmt.Errorf("error session time can not be lower than defaultInterimInterval")
 	}
-	return timer{
+	return Timer{
 		sessionDuration:              defaultSession,
 		sessionDurationFormat:        duration,
 		defaultInterimIntervalFormat: defaultDuration,
@@ -42,17 +43,19 @@ func IntialiseTimer() (timer, error) {
 }
 
 // CountInterimTimers provides total number of interim counters required for the session based on defaultInterimInterval
-func CountInterimTimers(t timer) int {
+func CountInterimTimers(t Timer) int {
 	timerCount := t.sessionDurationFormat.Seconds() / t.defaultInterimIntervalFormat.Seconds()
 	return int(timerCount)
 }
 
-// InitiateTicker starts a ticker
-func InitiateInterimTimer(t timer, status chan bool) {
+// InitiateInterimTimer starts a ticker
+func InitiateInterimTimer(t Timer, status chan bool) {
 	time.Sleep(t.defaultInterimIntervalFormat)
 	status <- true
 }
-func StartInterimTimer(w io.Writer, t timer, status chan bool) {
+
+// StartInterimTimer starts an interim Timer.
+func StartInterimTimer(w io.Writer, t Timer, status chan bool) {
 	ticker := time.NewTicker(defaultTickerInterval)
 	defer ticker.Stop()
 	go InitiateInterimTimer(t, status)

@@ -16,14 +16,16 @@ const (
 	defaultPort = "8083"
 )
 
-type httpServer struct {
+// HTTPServer holds required dependencies for http server.
+type HTTPServer struct {
 	Engine *gin.Engine
 	Logger logging.Logger
 	Server *http.Server
 }
 
+// NewHTTPServer creates new instance of http server.
 func NewHTTPServer(log logging.Logger,
-	engine *gin.Engine) (*httpServer, error) {
+	engine *gin.Engine) (*HTTPServer, error) {
 	var port string
 	config := cors.DefaultConfig()
 	config.AllowMethods = []string{"GET", "POST", "OPTIONS"}
@@ -35,7 +37,7 @@ func NewHTTPServer(log logging.Logger,
 	if port = os.Getenv(httpPort); port == "" {
 		port = defaultPort
 	}
-	h := &httpServer{
+	h := &HTTPServer{
 		Engine: engine,
 		Logger: log,
 		Server: &http.Server{
@@ -50,7 +52,9 @@ func NewHTTPServer(log logging.Logger,
 	h.Logger.Info("routes registration completed")
 	return h, nil
 }
-func (s *httpServer) Run(ctx context.Context) error {
+
+// Run starts http server.
+func (s *HTTPServer) Run(ctx context.Context) error {
 	errCh := make(chan error)
 	go func(e chan error) {
 		<-ctx.Done()
@@ -70,8 +74,9 @@ func (s *httpServer) Run(ctx context.Context) error {
 	}
 }
 
-func (h *httpServer) RegisterRoutes() error {
+// RegisterRoutes registers handlers and roues.
+func (s *HTTPServer) RegisterRoutes() error {
 	rList := &routeList{routeList: []*routes{}}
 	rList.addRoutes()
-	return h.register(rList)
+	return s.register(rList)
 }
