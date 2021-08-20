@@ -33,8 +33,6 @@ type PkgLogger struct {
 	Logger
 }
 
-
-
 // NewLogger initializes a new instance of logger
 func NewLogger(logger Logger) (*PkgLogger, error) {
 	return &PkgLogger{

@@ -19,12 +19,6 @@ func Test_create_new_server(t *testing.T) {
 	mockLogger := mock.NewMockLogger(mockCtrl)
 	mockLogger.EXPECT().Info(gomock.Any()).MaxTimes(4)
 	t.Run("should create new server", func(t *testing.T) {
-		server, err := NewHTTPServer(mockLogger,gin.Default())
-	mockCtrl := gomock.NewController(t)
-	defer mockCtrl.Finish()
-	mockLogger := mock.NewMockLogger(mockCtrl)
-	mockLogger.EXPECT().Info(gomock.Any()).MaxTimes(4)
-	t.Run("should create new server", func(t *testing.T) {
 		server, err := NewHTTPServer(mockLogger, gin.Default())
 		assert.Nil(t, err)
 		assert.NotNil(t, server)
@@ -46,11 +40,11 @@ func Test_create_new_server(t *testing.T) {
 func Test_run(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
-	mockCtrl:=gomock.NewController(t)
+	mockCtrl := gomock.NewController(t)
 	defer mockCtrl.Finish()
-	mockLogger:=mock.NewMockLogger(mockCtrl)
+	mockLogger := mock.NewMockLogger(mockCtrl)
 	mockLogger.EXPECT().Info(gomock.Any()).MinTimes(2)
-	s, err := NewHTTPServer(mockLogger,gin.Default())
+	s, err := NewHTTPServer(mockLogger, gin.Default())
 	assert.Nil(t, err)
 	t.Run("should start server", func(t *testing.T) {
 		errCh := make(chan error, 1)
