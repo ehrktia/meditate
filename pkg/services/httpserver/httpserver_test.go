@@ -14,12 +14,18 @@ import (
 
 func Test_create_new_server(t *testing.T) {
 	customPort := "9399"
-	mockCtrl:=gomock.NewController(t)
+	mockCtrl := gomock.NewController(t)
 	defer mockCtrl.Finish()
-	mockLogger:=mock.NewMockLogger(mockCtrl)
+	mockLogger := mock.NewMockLogger(mockCtrl)
 	mockLogger.EXPECT().Info(gomock.Any()).MaxTimes(4)
 	t.Run("should create new server", func(t *testing.T) {
 		server, err := NewHTTPServer(mockLogger,gin.Default())
+	mockCtrl := gomock.NewController(t)
+	defer mockCtrl.Finish()
+	mockLogger := mock.NewMockLogger(mockCtrl)
+	mockLogger.EXPECT().Info(gomock.Any()).MaxTimes(4)
+	t.Run("should create new server", func(t *testing.T) {
+		server, err := NewHTTPServer(mockLogger, gin.Default())
 		assert.Nil(t, err)
 		assert.NotNil(t, server)
 	})
@@ -27,7 +33,7 @@ func Test_create_new_server(t *testing.T) {
 		if err := os.Setenv(httpPort, customPort); err != nil {
 			t.Fatal(err)
 		}
-		srv, err := NewHTTPServer(mockLogger,gin.Default())
+		srv, err := NewHTTPServer(mockLogger, gin.Default())
 		assert.Nil(t, err)
 		assert.Equal(t, srv.Server.Addr, ":"+customPort)
 	})

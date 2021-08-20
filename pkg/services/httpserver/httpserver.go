@@ -9,6 +9,7 @@ import (
 	"github.com/meditate/pkg/logging"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.com/meditate/pkg/logging"
 )
 
 const (
@@ -23,7 +24,7 @@ type httpServer struct {
 }
 
 func NewHTTPServer(log logging.Logger,
-engine *gin.Engine) (*httpServer, error) {
+	engine *gin.Engine) (*httpServer, error) {
 	var port string
 	config := cors.DefaultConfig()
 	config.AllowMethods = []string{"GET", "POST", "OPTIONS"}
@@ -51,17 +52,23 @@ engine *gin.Engine) (*httpServer, error) {
 	return h, nil
 }
 func (s *httpServer) Run(ctx context.Context) error {
-	go func()error {
+	errCh := make(chan error)
+	go func(e chan error) {
 		<-ctx.Done()
 		if err := s.Server.Shutdown(ctx); err != nil {
+			errCh <- err
+		}
+	}(errCh)
+	select {
+	case err := <-errCh:
+		s.Logger.Errorf("error shutting down server: %v", err)
+		return err
+	default:
+		if err := s.Server.ListenAndServe(); err != nil {
 			return err
 		}
 		return nil
-	}()
-	if err := s.Server.ListenAndServe(); err != nil {
-		return err
 	}
-	return nil
 }
 
 func (h *httpServer) RegisterRoutes() error {

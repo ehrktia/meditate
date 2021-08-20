@@ -8,13 +8,13 @@ import (
 )
 
 func Test_new_logger(t *testing.T) {
-	prodLogger,err:=zap.NewProduction()
-if 	assert.NoError(t,err){
-	got,err:=NewLogger(prodLogger.Sugar())
+	prodLogger, err := zap.NewProduction()
 	if assert.NoError(t, err) {
-		assert.NotNil(t, got)
-		assert.IsType(t, &PkgLogger{}, got)
+		got, err := NewLogger(prodLogger.Sugar())
+		if assert.NoError(t, err) {
+			assert.NotNil(t, got)
+			assert.IsType(t, &PkgLogger{}, got)
+		}
 	}
-}
 
 }

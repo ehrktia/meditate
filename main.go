@@ -11,7 +11,7 @@ import (
 
 func main() {
 	ctx, cancel := context.WithCancel(context.Background())
-	prodLogger,err:=zap.NewProduction()
+	prodLogger, err := zap.NewProduction()
 	if err != nil {
 		cancel()
 		panic(err)
@@ -21,8 +21,8 @@ func main() {
 		cancel()
 		panic(err)
 	}
-	engine:=gin.New()
-	server, err := httpserver.NewHTTPServer(log,engine)
+	engine := gin.New()
+	server, err := httpserver.NewHTTPServer(log, engine)
 	if err != nil {
 		cancel()
 		log.Errorf("error creating new server: %v", err)
