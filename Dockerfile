@@ -1,9 +1,9 @@
 FROM golang:1.15.2-buster as builder
 WORKDIR /app
-COPY go.mod ./ 
-COPY go.sum ./  
+COPY go.mod . 
+COPY go.sum .  
 RUN go mod download -x 
-COPY . ./
+COPY . .
 ENV CGO_ENABLED=0 GO111MODULE=on
 RUN go build -mod=readonly -v -o meditate
 FROM debian:buster-slim

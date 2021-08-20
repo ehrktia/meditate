@@ -25,12 +25,12 @@ func (r *routeList) addRoutes() {
 		&routes{
 			path:    "/",
 			method:  http.MethodGet,
-			handler: homeHandler,
+			handler: homeHandler(),
 		},
 		&routes{
 			path:    "/login",
 			method:  http.MethodPost,
-			handler: loginHandler,
+			handler: loginHandler(),
 		},
 	)
 }

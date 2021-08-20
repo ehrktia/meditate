@@ -18,9 +18,9 @@ const (
 )
 
 type httpServer struct {
-	engine *gin.Engine
-	logger *zap.SugaredLogger
-	server *http.Server
+	Engine *gin.Engine
+	Logger *zap.SugaredLogger
+	Server *http.Server
 }
 
 func NewHTTPServer() (*httpServer, error) {
@@ -28,10 +28,10 @@ func NewHTTPServer() (*httpServer, error) {
 	gin.SetMode(gin.ReleaseMode)
 	r := gin.New()
 	config := cors.DefaultConfig()
-	config.AllowMethods=[]string{"GET","POST","OPTIONS"}
+	config.AllowMethods = []string{"GET", "POST", "OPTIONS"}
 	config.AllowOrigins = []string{"*"}
-	config.AllowCredentials=true
-	config.AllowHeaders=[]string{"Content-Type"}
+	config.AllowCredentials = true
+	config.AllowHeaders = []string{"Content-Type"}
 	r.Use(cors.New(config))
 	if port = os.Getenv(httpPort); port == "" {
 		port = defaultPort
@@ -42,9 +42,9 @@ func NewHTTPServer() (*httpServer, error) {
 	}
 	log.Info("server initalised in address ", port)
 	return &httpServer{
-		engine: r,
-		logger: log,
-		server: &http.Server{
+		Engine: r,
+		Logger: log,
+		Server: &http.Server{
 			Addr:    fmt.Sprintf(":%s", port),
 			Handler: r,
 		},
@@ -53,11 +53,11 @@ func NewHTTPServer() (*httpServer, error) {
 func (s *httpServer) Run(ctx context.Context) error {
 	go func() {
 		<-ctx.Done()
-		if err := s.server.Shutdown(ctx); err != nil {
-			s.logger.Errorf("error closing server: %v", err)
+		if err := s.Server.Shutdown(ctx); err != nil {
+			s.Logger.Errorf("error closing server: %v", err)
 		}
 	}()
-	if err := s.server.ListenAndServe(); err != nil {
+	if err := s.Server.ListenAndServe(); err != nil {
 		return err
 	}
 	return nil
