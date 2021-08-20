@@ -42,7 +42,7 @@ func NewHTTPServer() (*httpServer, error) {
 		port = defaultPort
 	}
 	log.Info("server initalised in address ", port)
-	return &httpServer{
+	h := &httpServer{
 		Engine: r,
 		Logger: log,
 		Server: &http.Server{

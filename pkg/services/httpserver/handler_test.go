@@ -10,28 +10,28 @@ import (
 )
 
 func Test_Home_Handler(t *testing.T) {
-	newTestServer:=&httpServer{
+	newTestServer := &httpServer{
 		Engine: gin.Default(),
 		Server: &http.Server{},
 	}
 	assert.Nil(t, newTestServer.RegisterRoutes(), "error registering routes")
-			apitest.New("homehandler").
-			Debug().
-			Handler(newTestServer.Engine).Get("/").
-			Expect(t).
-			Status(http.StatusOK).
-			End()
-	}
+	apitest.New("homehandler").
+		Debug().
+		Handler(newTestServer.Engine).Get("/").
+		Expect(t).
+		Status(http.StatusOK).
+		End()
+}
 func Test_Login_Handler(t *testing.T) {
-	newTestServer:=&httpServer{
+	newTestServer := &httpServer{
 		Engine: gin.Default(),
 		Server: &http.Server{},
 	}
 	assert.Nil(t, newTestServer.RegisterRoutes(), "error registering routes")
-			apitest.New("loginhandler").
-			Debug().
-			Handler(newTestServer.Engine).Post("/login").
-			Expect(t).
-			Status(http.StatusBadRequest).
-			End()
-	}
+	apitest.New("loginhandler").
+		Debug().
+		Handler(newTestServer.Engine).Post("/login").
+		Expect(t).
+		Status(http.StatusBadRequest).
+		End()
+}

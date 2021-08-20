@@ -8,25 +8,24 @@ import (
 	"github.com/meditate/pkg/model"
 )
 
-
-func homeHandler()gin.HandlerFunc{
+func homeHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		c.JSON(http.StatusOK,gin.H{"status":"ok",})
-}
+		c.JSON(http.StatusOK, gin.H{"status": "ok"})
+	}
 }
 func loginHandler() gin.HandlerFunc {
 	userToken := new(model.User)
 	return func(c *gin.Context) {
-	if err := c.ShouldBind(userToken); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"status": "not ok",
-			"token":  userToken.IDToken,
-			"error":  err.Error(),
+		if err := c.ShouldBind(userToken); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"status": "not ok",
+				"token":  userToken.IDToken,
+				"error":  err.Error(),
+			})
+		}
+		c.JSON(http.StatusOK, gin.H{
+			"token": userToken.IDToken,
 		})
-	}
-	c.JSON(http.StatusOK, gin.H{
-		"token": userToken.IDToken,
-	})
 	}
 }
 
