@@ -22,9 +22,7 @@ func Test_create_new_server(t *testing.T) {
 		}
 		srv, err := NewHTTPServer()
 		assert.Nil(t, err)
-		t.Logf("%s", srv.server.Addr)
-		assert.Equal(t, "0.0.0.0:"+customPort, srv.server.Addr, "error matching server port with address")
-		assert.NotNil(t, srv, "error create server with custom port")
+		assert.Equal(t, srv.Server.Addr, ":"+customPort)
 	})
 	t.Cleanup(func() {
 		if err := os.Unsetenv(httpPort); err != nil {

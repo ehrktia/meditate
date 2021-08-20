@@ -10,23 +10,12 @@ import (
 
 func homeHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"status": "ok",
-		})
+		c.JSON(http.StatusOK, gin.H{"status": "ok"})
 	}
 }
-
-func logoutHandler() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"status": "logout successful",
-		})
-	}
-}
-
 func loginHandler() gin.HandlerFunc {
+	userToken := new(model.User)
 	return func(c *gin.Context) {
-		userToken := new(model.User)
 		if err := c.ShouldBind(userToken); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{
 				"status": "not ok",
@@ -44,9 +33,9 @@ func (h *httpServer) register(routes *routeList) error {
 	for _, route := range routes.routeList {
 		switch route.method {
 		case http.MethodGet:
-			h.engine.GET(route.path, route.handler)
+			h.Engine.GET(route.path, route.handler)
 		case http.MethodPost:
-			h.engine.POST(route.path, route.handler)
+			h.Engine.POST(route.path, route.handler)
 		default:
 			return fmt.Errorf("not a valid method")
 		}
