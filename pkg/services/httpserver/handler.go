@@ -8,6 +8,7 @@ import (
 	"github.com/meditate/pkg/model"
 )
 
+
 func homeHandler()gin.HandlerFunc{
 	return func(c *gin.Context) {
 		c.JSON(http.StatusOK,gin.H{"status":"ok",})

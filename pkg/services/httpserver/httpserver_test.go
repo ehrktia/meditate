@@ -11,10 +11,10 @@ import (
 
 func Test_create_new_server(t *testing.T) {
 	customPort := "9399"
-	s, err := NewHTTPServer()
 	t.Run("should create new server", func(t *testing.T) {
+		server, err := NewHTTPServer()
 		assert.Nil(t, err)
-		assert.NotNil(t, s)
+		assert.NotNil(t, server)
 	})
 	t.Run("should be able to set customPort", func(t *testing.T) {
 		if err := os.Setenv(httpPort, customPort); err != nil {
@@ -28,13 +28,6 @@ func Test_create_new_server(t *testing.T) {
 		if err := os.Unsetenv(httpPort); err != nil {
 			t.Fatal(err)
 		}
-	})
-}
-func Test_routes(t *testing.T) {
-	s, err := NewHTTPServer()
-	assert.Nil(t, err)
-	t.Run("should add routes to server", func(t *testing.T) {
-		assert.Nil(t, s.RegisterRoutes())
 	})
 }
 func Test_run(t *testing.T) {
