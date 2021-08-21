@@ -28,10 +28,8 @@ func NewHTTPServer(log logging.Logger,
 	engine *gin.Engine) (*HTTPServer, error) {
 	var port string
 	config := cors.DefaultConfig()
-	config.AllowMethods = []string{"GET", "POST", "OPTIONS"}
 	config.AllowOrigins = []string{"*"}
 	config.AllowCredentials = true
-	config.AllowHeaders = []string{"Content-Type"}
 	engine.Use(cors.New(config))
 
 	if port = os.Getenv(httpPort); port == "" {
