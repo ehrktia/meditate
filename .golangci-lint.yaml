@@ -184,7 +184,7 @@ linters-settings:
       underef:
         # whether to skip (*x).method() calls where x is a pointer receiver (default true)
         skipRecvDeref: true
-    	unnamedResult:
+      unnamedResult:
         # whether to check exported functions
         checkExported: true
   gocyclo:
@@ -298,7 +298,7 @@ linters-settings:
       # specify an error message to output when a blacklisted package is used
       - github.com/sirupsen/logrus: "logging is allowed only by logutils.Log"
   ifshort:
-    # Maximum length of variable declaration measured in number of lines, after which linter won't suggest using short syntax. 
+    # Maximum length of variable declaration measured in number of lines, after which linter won't suggest using short syntax.
     # Has higher priority than max-decl-chars.
     max-decl-lines: 1
     # Maximum length of variable declaration measured in number of characters, after which linter won't suggest using short syntax.
@@ -419,13 +419,13 @@ linters-settings:
   #  for more info.
   custom:
     # Each custom linter should have a unique name.
-     example:
+    example:
       # The path to the plugin *.so. Can be absolute or local. Required for each custom linter
-      path: /path/to/example.so
+    path: /path/to/example.so
       # The description of the linter. Optional, just for documentation purposes.
-      description: This is an example usage of a plugin linter.
+    description: This is an example usage of a plugin linter.
       # Intended to point to the repo location of the linter. Optional, just for documentation purposes.
-      original-url: github.com/golangci/example-linter
+    original-url: github.com/golangci/example-linter
 
 linters:
   enable:
@@ -535,5 +535,5 @@ severity:
   # Only affects out formats that support setting severity information.
   rules:
     - linters:
-      - dupl
+        - dupl
       severity: info
