@@ -8,49 +8,66 @@ import (
 )
 
 const (
-	defaultInterimInterval = "INTERIM_INTERVAL"
-	defaultTickerInterval  = 1 * time.Second
-	defaultSessionDuration = "SESSION_DURATION"
+	interimInterval       = "INTERIM_INTERVAL"
+	defaultTickerInterval = 1 * time.Second
+	sessionDuration       = "SESSION_DURATION"
 )
 
 // Timer holds session and interim timer.
 type Timer struct {
-	sessionDuration              string
-	sessionDurationFormat        time.Duration
-	defaultInterimIntervalFormat time.Duration
+	sessionDuration        time.Duration
+	defaultInterimInterval time.Duration
 }
 
-// IntialiseTimer starts a timer for provided duration
-func IntialiseTimer() (Timer, error) {
-	defaultSession := os.Getenv(defaultSessionDuration)
+// DefaultTimerEnv uses all default values from environment
+func DefaultTimerFromEnv() (Timer, error) {
+	defaultSession := os.Getenv(sessionDuration)
 	duration, err := time.ParseDuration(defaultSession)
 	if err != nil {
 		return Timer{}, err
 	}
-	defaultInterim := os.Getenv(defaultInterimInterval)
+	defaultInterim := os.Getenv(interimInterval)
 	defaultDuration, err := time.ParseDuration(defaultInterim)
 	if err != nil {
 		return Timer{}, err
 	}
-	if duration.Seconds() < defaultDuration.Seconds() {
-		return Timer{}, fmt.Errorf("error session time can not be lower than defaultInterimInterval")
+	return Timer{
+		sessionDuration:        duration,
+		defaultInterimInterval: defaultDuration,
+	}, nil
+}
+
+// IntialiseTimer starts a timer for provided duration using custom input values
+func IntialiseTimer(duration, interim string) (Timer, error) {
+	sDuration, err := time.ParseDuration(duration)
+	if err != nil {
+		return Timer{}, err
+	}
+	interimDuration, err := time.ParseDuration(interim)
+	if err != nil {
+		return Timer{}, err
 	}
 	return Timer{
-		sessionDuration:              defaultSession,
-		sessionDurationFormat:        duration,
-		defaultInterimIntervalFormat: defaultDuration,
+		sessionDuration:        sDuration,
+		defaultInterimInterval: interimDuration,
 	}, nil
+}
+func (t Timer) validateDuration() bool {
+	return t.sessionDuration > t.defaultInterimInterval
 }
 
 // CountInterimTimers provides total number of interim counters required for the session based on defaultInterimInterval
 func CountInterimTimers(t Timer) int {
-	timerCount := t.sessionDurationFormat.Seconds() / t.defaultInterimIntervalFormat.Seconds()
-	return int(timerCount)
+	if t.validateDuration() {
+		timerCount := t.sessionDuration.Seconds() / t.defaultInterimInterval.Seconds()
+		return int(timerCount)
+	}
+	return 0
 }
 
 // InitiateInterimTimer starts a ticker
 func InitiateInterimTimer(t Timer, status chan bool) {
-	time.Sleep(t.defaultInterimIntervalFormat)
+	time.Sleep(t.defaultInterimInterval)
 	status <- true
 }
 
