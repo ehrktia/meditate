@@ -19,21 +19,15 @@ func TestCreateticker(t *testing.T) {
 		if err := os.Setenv(sessionDuration, sDuration); err != nil {
 			t.Error(err)
 		}
-		got, err := DefaultTimerFromEnv()
+		_, err := DefaultTimerFromEnv()
 		if err != nil {
 			t.Fatal(err)
-		}
-		if &got == nil {
-			t.Fatal("expected to get valid timer with default env vars")
 		}
 	})
 	t.Run("create custom timer from input val", func(t *testing.T) {
-		got, err := IntialiseTimer(sDuration, interimDuration)
+	_, err := IntialiseTimer(sDuration, interimDuration)
 		if err != nil {
 			t.Fatal(err)
-		}
-		if &got == nil {
-			t.Fatal("expected to get valid timer with default env vars")
 		}
 	})
 	t.Cleanup(func() {
