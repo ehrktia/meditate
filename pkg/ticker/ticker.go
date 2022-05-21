@@ -56,12 +56,11 @@ func (t Timer) validateDuration() bool {
 	return t.sessionDuration > t.defaultInterimInterval
 }
 
-
 // CountInterimTimers provides total number of interim counters required for the session based on defaultInterimInterval
 func CountInterimTimers(t Timer) int {
 	if t.validateDuration() {
-	timerCount := t.sessionDuration.Seconds() / t.defaultInterimInterval.Seconds()
-	return int(timerCount)
+		timerCount := t.sessionDuration.Seconds() / t.defaultInterimInterval.Seconds()
+		return int(timerCount)
 	}
 	return 0
 }
