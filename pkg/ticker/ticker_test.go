@@ -6,56 +6,78 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
 	"go.uber.org/zap/buffer"
 )
 
 func TestCreateticker(t *testing.T) {
-	sessionDuration := "1m"
 	interimDuration := "30s"
-	errDuration := "3m"
-	if err := os.Setenv(defaultInterimInterval, interimDuration); err != nil {
-		t.Error(err)
-	}
-	if err := os.Setenv(defaultSessionDuration, sessionDuration); err != nil {
-		t.Error(err)
-	}
-	got, err := IntialiseTimer()
-	t.Run("should create timer", func(t *testing.T) {
-		assert.Equal(t, sessionDuration, got.sessionDuration)
-		assert.Nil(t, err)
-	})
-	if err := os.Unsetenv(defaultSessionDuration); err != nil {
-		t.Error(err)
-	}
-	if err := os.Unsetenv(defaultInterimInterval); err != nil {
-		t.Error(err)
-	}
-	t.Run("should return error when sessionDuration is lower than defaultInterimInterval", func(t *testing.T) {
-		if err := os.Setenv(defaultInterimInterval, errDuration); err != nil {
+	sDuration := "1m"
+	t.Run("create default timer from env vars", func(t *testing.T) {
+		if err := os.Setenv(interimInterval, interimDuration); err != nil {
 			t.Error(err)
 		}
-		_, err := IntialiseTimer()
-		assert.NotNil(t, err)
+		if err := os.Setenv(sessionDuration, sDuration); err != nil {
+			t.Error(err)
+		}
+		got, err := DefaultTimerFromEnv()
+		if err != nil {
+			t.Fatal(err)
+		}
+		if &got == nil {
+			t.Fatal("expected to get valid timer with default env vars")
+		}
+	})
+	t.Run("create custom timer from input val", func(t *testing.T) {
+		got, err := IntialiseTimer(sDuration, interimDuration)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if &got == nil {
+			t.Fatal("expected to get valid timer with default env vars")
+		}
 	})
 	t.Cleanup(func() {
-		if err := os.Unsetenv(defaultSessionDuration); err != nil {
+		if err := os.Unsetenv(sessionDuration); err != nil {
 			t.Error(err)
 		}
-		if err := os.Unsetenv(defaultInterimInterval); err != nil {
+		if err := os.Unsetenv(interimInterval); err != nil {
 			t.Error(err)
 		}
 	})
 }
+
+func Test_count_timers(t *testing.T) {
+	tests := []struct {
+		name    string
+		timer   Timer
+		want    int
+		wantErr bool
+		err     error
+	}{
+		{
+			name: "valid counter",
+			timer: Timer{
+				sessionDuration:        time.Duration(60),
+				defaultInterimInterval: time.Duration(10),
+			},
+			want: int(time.Duration(60).Seconds() / time.Duration(10).Seconds()),
+		},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			got := CountInterimTimers(test.timer)
+			if got != test.want {
+				t.Logf("[%v]-got,[%v]-want", got, test.want)
+			}
+
+		})
+	}
+}
 func TestInterimTicker(t *testing.T) {
-	if err := os.Setenv(defaultInterimInterval, "5s"); err != nil {
-		t.Error(err)
+	timer, err := IntialiseTimer("10s", "5s")
+	if err != nil {
+		t.Fatal(err)
 	}
-	if err := os.Setenv(defaultSessionDuration, "10s"); err != nil {
-		t.Error(err)
-	}
-	timer, err := IntialiseTimer()
-	assert.Nil(t, err)
 	status := make(chan bool)
 	t.Run("should start a ticker for the interim interval period set", func(t *testing.T) {
 		go InitiateInterimTimer(timer, status)
@@ -77,11 +99,6 @@ func TestInterimTicker(t *testing.T) {
 		StartInterimTimer(buf, timer, status)
 		if strings.Count(buf.String(), "\n") < 6 {
 			t.Error("expected 6 lines in output")
-		}
-	})
-	t.Cleanup(func() {
-		if err := os.Unsetenv(defaultInterimInterval); err != nil {
-			t.Error(err)
 		}
 	})
 }
