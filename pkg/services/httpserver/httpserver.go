@@ -9,7 +9,6 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	opentracing "github.com/opentracing/opentracing-go"
-	"github.com/web-alytics/meditate/pkg/logging"
 )
 
 const (
@@ -18,16 +17,15 @@ const (
 )
 
 //go:generate mockgen -package=mocks -destination=mocks/${GOFILE} github.com/opentracing/opentracing-go Tracer
-//HTTPServer holds required dependencies for http server.
+// HTTPServer holds required dependencies for http server.
 type HTTPServer struct {
 	Engine *gin.Engine
-	Logger logging.Logger
 	Server *http.Server
 	Tracer opentracing.Tracer
 }
 
 // NewHTTPServer creates new instance of http server.
-func NewHTTPServer(log logging.Logger,
+func NewHTTPServer(
 	engine *gin.Engine,
 	tracer opentracing.Tracer) (*HTTPServer, error) {
 	var port string
@@ -41,18 +39,15 @@ func NewHTTPServer(log logging.Logger,
 	}
 	h := &HTTPServer{
 		Engine: engine,
-		Logger: log,
 		Tracer: tracer,
 		Server: &http.Server{
 			Addr:    fmt.Sprintf(":%s", port),
 			Handler: engine,
 		},
 	}
-	h.Logger.Info("server initalised in address ", port)
 	if err := h.RegisterRoutes(); err != nil {
 		return nil, err
 	}
-	h.Logger.Info("routes registration completed")
 	return h, nil
 }
 
@@ -67,7 +62,6 @@ func (s *HTTPServer) Run(ctx context.Context) error {
 	}(errCh)
 	select {
 	case err := <-errCh:
-		s.Logger.Errorf("error shutting down server: %v", err)
 		return err
 	default:
 		if err := s.Server.ListenAndServe(); err != nil {
