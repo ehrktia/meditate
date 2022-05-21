@@ -10,6 +10,7 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	mock "github.com/web-alytics/meditate/pkg/logging/mocks"
+	"github.com/web-alytics/meditate/pkg/services/httpserver/mocks"
 )
 
 func Test_create_new_server(t *testing.T) {
@@ -17,9 +18,10 @@ func Test_create_new_server(t *testing.T) {
 	mockCtrl := gomock.NewController(t)
 	defer mockCtrl.Finish()
 	mockLogger := mock.NewMockLogger(mockCtrl)
+	mockTracer := mocks.NewMockTracer(mockCtrl)
 	mockLogger.EXPECT().Info(gomock.Any()).MaxTimes(4)
 	t.Run("should create new server", func(t *testing.T) {
-		server, err := NewHTTPServer(mockLogger, gin.Default())
+		server, err := NewHTTPServer(mockLogger, gin.Default(), mockTracer)
 		assert.Nil(t, err)
 		assert.NotNil(t, server)
 	})
@@ -27,7 +29,7 @@ func Test_create_new_server(t *testing.T) {
 		if err := os.Setenv(httpPort, customPort); err != nil {
 			t.Fatal(err)
 		}
-		srv, err := NewHTTPServer(mockLogger, gin.Default())
+		srv, err := NewHTTPServer(mockLogger, gin.Default(), mockTracer)
 		assert.Nil(t, err)
 		assert.Equal(t, srv.Server.Addr, ":"+customPort)
 	})
@@ -43,8 +45,9 @@ func Test_run(t *testing.T) {
 	mockCtrl := gomock.NewController(t)
 	defer mockCtrl.Finish()
 	mockLogger := mock.NewMockLogger(mockCtrl)
+	mockTracer := mocks.NewMockTracer(mockCtrl)
 	mockLogger.EXPECT().Info(gomock.Any()).MinTimes(2)
-	s, err := NewHTTPServer(mockLogger, gin.Default())
+	s, err := NewHTTPServer(mockLogger, gin.Default(), mockTracer)
 	assert.Nil(t, err)
 	t.Run("should start server", func(t *testing.T) {
 		errCh := make(chan error, 1)
