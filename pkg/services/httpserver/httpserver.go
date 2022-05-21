@@ -8,6 +8,7 @@ import (
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.com/opentracing/opentracing-go"
 	"github.com/web-alytics/meditate/pkg/logging"
 )
 
@@ -16,16 +17,19 @@ const (
 	defaultPort = "8083"
 )
 
-// HTTPServer holds required dependencies for http server.
+//go:generate mockgen -package=mocks -destination=mocks/${GOFILE} github.com/opentracing/opentracing-go Tracer
+//HTTPServer holds required dependencies for http server.
 type HTTPServer struct {
 	Engine *gin.Engine
 	Logger logging.Logger
 	Server *http.Server
+	Tracer opentracing.Tracer
 }
 
 // NewHTTPServer creates new instance of http server.
 func NewHTTPServer(log logging.Logger,
-	engine *gin.Engine) (*HTTPServer, error) {
+	engine *gin.Engine,
+	tracer opentracing.Tracer) (*HTTPServer, error) {
 	var port string
 	config := cors.DefaultConfig()
 	config.AllowOrigins = []string{"*"}
@@ -38,6 +42,7 @@ func NewHTTPServer(log logging.Logger,
 	h := &HTTPServer{
 		Engine: engine,
 		Logger: log,
+		Tracer: tracer,
 		Server: &http.Server{
 			Addr:    fmt.Sprintf(":%s", port),
 			Handler: engine,
