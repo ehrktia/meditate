@@ -9,6 +9,7 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	opentracing "github.com/opentracing/opentracing-go"
+	"github.com/web-alytics/meditate/pkg/logging"
 )
 
 const (
@@ -25,7 +26,7 @@ type HTTPServer struct {
 }
 
 // NewHTTPServer creates new instance of http server.
-func NewHTTPServer(
+func NewHTTPServer(ctx context.Context,
 	engine *gin.Engine,
 	tracer opentracing.Tracer) (*HTTPServer, error) {
 	var port string
@@ -33,9 +34,11 @@ func NewHTTPServer(
 	config.AllowOrigins = []string{"*"}
 	config.AllowCredentials = true
 	engine.Use(cors.New(config))
+	logger := logging.LogFromCtx(ctx)
 
 	if port = os.Getenv(httpPort); port == "" {
 		port = defaultPort
+		logger.Sugar().Infof("default port used: [%s]", defaultPort)
 	}
 	h := &HTTPServer{
 		Engine: engine,

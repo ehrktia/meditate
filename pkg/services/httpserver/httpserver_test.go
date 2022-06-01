@@ -18,7 +18,7 @@ func Test_create_new_server(t *testing.T) {
 	defer mockCtrl.Finish()
 	mockTracer := mocks.NewMockTracer(mockCtrl)
 	t.Run("should create new server", func(t *testing.T) {
-		server, err := NewHTTPServer(gin.Default(), mockTracer)
+		server, err := NewHTTPServer(context.Background(), gin.Default(), mockTracer)
 		assert.Nil(t, err)
 		assert.NotNil(t, server)
 	})
@@ -26,7 +26,7 @@ func Test_create_new_server(t *testing.T) {
 		if err := os.Setenv(httpPort, customPort); err != nil {
 			t.Fatal(err)
 		}
-		srv, err := NewHTTPServer(gin.Default(), mockTracer)
+		srv, err := NewHTTPServer(context.Background(), gin.Default(), mockTracer)
 		assert.Nil(t, err)
 		assert.Equal(t, srv.Server.Addr, ":"+customPort)
 	})
@@ -42,7 +42,7 @@ func Test_run(t *testing.T) {
 	mockCtrl := gomock.NewController(t)
 	defer mockCtrl.Finish()
 	mockTracer := mocks.NewMockTracer(mockCtrl)
-	s, err := NewHTTPServer(gin.Default(), mockTracer)
+	s, err := NewHTTPServer(context.Background(), gin.Default(), mockTracer)
 	assert.Nil(t, err)
 	t.Run("should start server", func(t *testing.T) {
 		errCh := make(chan error, 1)
