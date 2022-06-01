@@ -1,0 +1,25 @@
+mode: atomic
+github.com/web-alytics/meditate/pkg/logging/logging.go:20.24,21.17 1 0
+github.com/web-alytics/meditate/pkg/logging/logging.go:24.2,24.21 1 0
+github.com/web-alytics/meditate/pkg/logging/logging.go:21.17,23.3 1 0
+github.com/web-alytics/meditate/pkg/logging/logging.go:28.69,31.2 2 0
+github.com/web-alytics/meditate/pkg/logging/logging.go:33.50,36.2 2 0
+github.com/web-alytics/meditate/pkg/ticker/ticker.go:23.43,26.16 3 1
+github.com/web-alytics/meditate/pkg/ticker/ticker.go:29.2,31.16 3 1
+github.com/web-alytics/meditate/pkg/ticker/ticker.go:34.2,37.8 1 1
+github.com/web-alytics/meditate/pkg/ticker/ticker.go:26.16,28.3 1 0
+github.com/web-alytics/meditate/pkg/ticker/ticker.go:31.16,33.3 1 0
+github.com/web-alytics/meditate/pkg/ticker/ticker.go:41.62,43.16 2 2
+github.com/web-alytics/meditate/pkg/ticker/ticker.go:46.2,47.16 2 2
+github.com/web-alytics/meditate/pkg/ticker/ticker.go:50.2,53.8 1 2
+github.com/web-alytics/meditate/pkg/ticker/ticker.go:43.16,45.3 1 0
+github.com/web-alytics/meditate/pkg/ticker/ticker.go:47.16,49.3 1 0
+github.com/web-alytics/meditate/pkg/ticker/ticker.go:55.40,57.2 1 2
+github.com/web-alytics/meditate/pkg/ticker/ticker.go:60.38,61.26 1 2
+github.com/web-alytics/meditate/pkg/ticker/ticker.go:65.2,65.10 1 0
+github.com/web-alytics/meditate/pkg/ticker/ticker.go:61.26,64.3 2 2
+github.com/web-alytics/meditate/pkg/ticker/ticker.go:69.54,72.2 2 2
+github.com/web-alytics/meditate/pkg/ticker/ticker.go:75.64,79.6 4 1
+github.com/web-alytics/meditate/pkg/ticker/ticker.go:79.6,80.10 1 6
+github.com/web-alytics/meditate/pkg/ticker/ticker.go:81.25,82.40 1 5
+github.com/web-alytics/meditate/pkg/ticker/ticker.go:83.17,85.10 2 1
