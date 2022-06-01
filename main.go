@@ -15,8 +15,9 @@ import (
 var svcname = "meditate"
 
 func main() {
-	ctx, cancel := context.WithCancel(context.Background())
 	log := logging.New()
+	ctx, cancel := context.WithCancel(context.Background())
+	ctx = logging.LogToCtx(ctx, log)
 	tracer, closer, err := initJaegerTracer(svcname)
 	defer closer.Close()
 	if err != nil {
@@ -24,7 +25,7 @@ func main() {
 		log.Sugar().Errorf("error initializing tracing: %v", err)
 	}
 	engine := gin.New()
-	server, err := httpserver.NewHTTPServer(
+	server, err := httpserver.NewHTTPServer(ctx,
 		engine, tracer)
 	if err != nil {
 		cancel()
