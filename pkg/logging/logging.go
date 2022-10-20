@@ -2,9 +2,11 @@ package logging
 
 import (
 	"context"
+	"os"
 	"sync"
 
 	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 )
 
 // Key is generic key used for ctx value load
@@ -16,12 +18,32 @@ var (
 	GlobalLogger *zap.Logger
 )
 
+type config struct {
+	loglevel string
+}
+
 // New generates a singleton instance of logger
 func New() *zap.Logger {
+	c := newCoreConfig("Debug")
+	core := zapcore.NewCore(c, os.Stderr, zap.DebugLevel)
 	once.Do(func() {
-		GlobalLogger = zap.New(nil)
+		GlobalLogger = zap.New(zapcore.NewCore())
 	})
 	return GlobalLogger
+}
+func newCoreConfig(level string) zapcore.EncoderConfig {
+	return zapcore.EncoderConfig{
+		TimeKey:        "ts",
+		LevelKey:       level,
+		CallerKey:      "log",
+		MessageKey:     "msg",
+		StacktraceKey:  "stack-trace",
+		LineEnding:     zapcore.DefaultLineEnding,
+		EncodeLevel:    zapcore.CapitalColorLevelEncoder,
+		EncodeDuration: zapcore.MillisDurationEncoder,
+	}
+	zap.NewProductionEncoderConfig()
+
 }
 
 // LogToCtx loads logger to context
